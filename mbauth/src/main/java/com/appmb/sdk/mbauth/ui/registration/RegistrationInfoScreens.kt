@@ -1,10 +1,14 @@
 package com.appmb.sdk.mbauth.ui.registration
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.DropdownMenu
@@ -16,13 +20,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.appmb.sdk.mbauth.model.MbAuthParams
@@ -259,6 +270,8 @@ private fun GenderDropdownField(
   onValueChange: (String) -> Unit,
 ) {
   var expanded by rememberSaveable { mutableStateOf(false) }
+  var fieldSize by remember { mutableStateOf(Size.Zero) }
+  val density = LocalDensity.current
 
   BasicText(
     text = label,
@@ -274,14 +287,32 @@ private fun GenderDropdownField(
   Box(
     modifier = Modifier
       .fillMaxWidth()
+      .onGloballyPositioned { coordinates ->
+        fieldSize = coordinates.size.toSize()
+      }
       .clickable { expanded = true }
   ) {
-    TextInputField(
-      textFieldValue = value,
-      onValueChange = {},
-      placeholder = placeholder,
-      modifier = Modifier.clickable { expanded = true },
-    )
+    Box(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(top = 4.dp)
+        .heightIn(min = 32.dp)
+        .background(
+          color = colorResource(R.color.input_background_color),
+          shape = RoundedCornerShape(8.dp)
+        )
+        .padding(horizontal = 16.dp, vertical = 10.dp),
+      contentAlignment = Alignment.CenterStart,
+    ) {
+      BasicText(
+        text = value.ifBlank { placeholder },
+        style = TextStyle(
+          color = if (value.isBlank()) Color.Gray else Color.White,
+          fontSize = 12.sp,
+          fontFamily = CustomFont.fzPoppinsFont,
+        )
+      )
+    }
     Icon(
       imageVector = Icons.Default.KeyboardArrowDown,
       contentDescription = null,
@@ -293,7 +324,8 @@ private fun GenderDropdownField(
     DropdownMenu(
       expanded = expanded,
       onDismissRequest = { expanded = false },
-      modifier = Modifier.fillMaxWidth()
+      offset = DpOffset(0.dp, 0.dp),
+      modifier = Modifier.width(with(density) { fieldSize.width.toDp() })
     ) {
       options.forEach { option ->
         DropdownMenuItem(
