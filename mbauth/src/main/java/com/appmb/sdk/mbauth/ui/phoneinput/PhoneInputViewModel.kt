@@ -24,6 +24,10 @@ class PhoneInputViewModel : ViewModel() {
     _uiState.update { it.copy(acceptTerms = accepted) }
   }
 
+  fun onConfirmedAge16OrOlderChange(confirmed: Boolean) {
+    _uiState.update { it.copy(confirmedAge16OrOlder = confirmed) }
+  }
+
   fun onPhoneChange(phone: String) {
     val error = when {
       phone.isBlank() -> "Thông tin đăng nhập không hợp lệ"

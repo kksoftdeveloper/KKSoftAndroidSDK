@@ -17,8 +17,9 @@ class SignUpPasswordInputScreen(
   private val authViewModel: AuthViewModel,
   phoneNumber: String,
   onClose: () -> Unit,
+  stepLabel: String? = null,
   private val navigateToChooseServer: () -> Unit,
-) : PasswordInputView(phoneNumber, onClose) {
+) : PasswordInputView(phoneNumber, onClose, stepLabel) {
 
   override fun onCompletePasswordInput(
     phoneNumber: String,

@@ -18,7 +18,7 @@
 2. Add the KKSoft SDK dependency to the Android library/app module:
 
    ```gradle
-   implementation("com.github.kksoftdeveloper:KKSoftAndroidSDK:b804d5d")
+   implementation("com.github.kksoftdeveloper:KKSoftAndroidSDK:352227d")
    ```
 
    Use `api(...)` instead of `implementation(...)` when another module, such as

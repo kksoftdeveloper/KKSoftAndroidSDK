@@ -37,6 +37,7 @@ import org.koin.androidx.compose.koinViewModel
 abstract class PasswordInputView(
   private val phoneNumber: String,
   private val onClose: () -> Unit,
+  private val stepLabel: String? = null,
 ) {
 
   abstract fun onCompletePasswordInput(phoneNumber: String, password: String)
@@ -76,7 +77,7 @@ abstract class PasswordInputView(
       onCloseButtonClick = onClose,
     ) {
       Text(
-        text = stringResource(R.string.step_3),
+        text = stepLabel ?: stringResource(R.string.step_3),
         color = colorResource(R.color.gray_text_color),
         fontFamily = CustomFont.fsClanPro,
         fontSize = 15.sp,

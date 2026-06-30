@@ -46,6 +46,7 @@ fun OtpInputScreen(
   otpType: String,
   phoneNumber: String,
   timeToRetry: Int,
+  stepLabel: String? = null,
   onOtpVerifiedSuccess: () -> Unit,
   onClose: () -> Unit
 ) {
@@ -89,7 +90,7 @@ fun OtpInputScreen(
     },
   ) {
     Text(
-      text = stringResource(R.string.step_2),
+      text = stepLabel ?: stringResource(R.string.step_2),
       color = colorResource(R.color.gray_text_color),
       fontFamily = CustomFont.fsClanPro,
       fontSize = 15.sp,

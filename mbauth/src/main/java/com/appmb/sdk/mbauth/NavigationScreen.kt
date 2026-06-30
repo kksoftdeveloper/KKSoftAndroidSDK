@@ -24,13 +24,32 @@ data class RequestOTP(val otpType: String) : AuthScreen(name = NAME) {
 data class VerifyOTP(val phone: String, val timeToRetry: Int, val otpType: String) :
   AuthScreen(name = NAME) {
   companion object {
-    const val NAME = "VerifyOTP/{phone}/{timeToRetry}/{otpType}"
+    const val NAME = "VerifyOTP/{phone}/{timeToRetry}/{otpType}/{isUnder16}"
   }
 }
 
-data class Register(val phone: String) : AuthScreen(name = NAME) {
+data class RegisterPersonalInfo(val phone: String, val isUnder16: Boolean) : AuthScreen(name = NAME) {
   companion object {
-    const val NAME = "Register/{phone}"
+    const val NAME = "RegisterPersonalInfo/{phone}/{isUnder16}"
+  }
+}
+
+data class RegisterGuardianInfo(val phone: String) : AuthScreen(name = NAME) {
+  companion object {
+    const val NAME = "RegisterGuardianInfo/{phone}"
+  }
+}
+
+data class RegisterGuardianOTP(val phone: String, val guardianPhone: String, val timeToRetry: Int) :
+  AuthScreen(name = NAME) {
+  companion object {
+    const val NAME = "RegisterGuardianOTP/{phone}/{guardianPhone}/{timeToRetry}"
+  }
+}
+
+data class Register(val phone: String, val isUnder16: Boolean) : AuthScreen(name = NAME) {
+  companion object {
+    const val NAME = "Register/{phone}/{isUnder16}"
   }
 }
 

@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.appmb.sdk.mbauth.model.MbAuthParams
 import com.appmb.sdk.mbauth.ui.components.TermsAndConditionsText
 import com.appmb.sdk.mbauth.ui.frame.MbAuthFrameContainer
 import com.appmb.sdk.mbcoreui.R
@@ -35,7 +36,8 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun PhoneInputView(
   otpType: String,
-  navigateToVerifyOtp: (String, Int) -> Unit,
+  stepLabel: String? = null,
+  navigateToVerifyOtp: (String, Int, Boolean) -> Unit,
   onClose: () -> Unit
 ) {
   val viewModel: PhoneInputViewModel = koinViewModel()
@@ -45,6 +47,8 @@ fun PhoneInputView(
 
   var phoneNumber by rememberSaveable { mutableStateOf("") }
   var acceptTerms by rememberSaveable { mutableStateOf(false) }
+  var confirmedAge16OrOlder by rememberSaveable { mutableStateOf(false) }
+  val isRegistration = otpType == MbAuthParams.OTP_TYPE_PARAM_REGISTRATION
 
   // Display api request error
   var apiError by rememberSaveable { mutableStateOf("") }
@@ -61,7 +65,11 @@ fun PhoneInputView(
 
     is RequestOtpState.Success -> {
       viewModel.dispatchUiEvent(PhoneInputIntent.ResetState)
-      navigateToVerifyOtp(state.phone, state.timeToRetry)
+      navigateToVerifyOtp(
+        state.phone,
+        state.timeToRetry,
+        isRegistration && !confirmedAge16OrOlder
+      )
     }
 
     else -> Unit
@@ -79,7 +87,7 @@ fun PhoneInputView(
     }
   ) {
     Text(
-      text = stringResource(R.string.step_1),
+      text = stepLabel ?: stringResource(R.string.step_1),
       color = colorResource(R.color.gray_text_color),
       fontFamily = CustomFont.fsClanPro,
       fontSize = 15.sp,
@@ -142,6 +150,35 @@ fun PhoneInputView(
       )
       TermsAndConditionsText()
     }
+    if (isRegistration) {
+      Row(
+        verticalAlignment = Alignment.Top,
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(top = 8.dp)
+      ) {
+        CustomCheckbox(
+          checked = confirmedAge16OrOlder,
+          onCheckedChange = {
+            confirmedAge16OrOlder = it
+            viewModel.onConfirmedAge16OrOlderChange(it)
+          },
+          modifier = Modifier.size(16.dp)
+        )
+        Spacer(
+          modifier = Modifier.width(width = 4.dp)
+        )
+        BasicText(
+          text = stringResource(R.string.confirm_age_16_or_older),
+          style = TextStyle(
+            color = colorResource(R.color.black),
+            fontFamily = CustomFont.fzPoppinsFont,
+            fontSize = 10.sp,
+          ),
+          modifier = Modifier.weight(1f)
+        )
+      }
+    }
     BasicText(
       text = uiState.phoneError ?: apiError,
       style = TextStyle(
@@ -162,7 +199,7 @@ fun PhoneInputView(
 fun previewPhoneInputView() {
   PhoneInputView(
     otpType = "SMS",
-    navigateToVerifyOtp = { _, _ -> },
+    navigateToVerifyOtp = { _, _, _ -> },
     onClose = {}
   )
 }

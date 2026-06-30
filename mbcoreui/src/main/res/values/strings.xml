@@ -36,6 +36,7 @@
   <string name="common_continue">Tiếp tục</string>
   <string name="phone_number_hint">(+84) 912 345 6780</string>
   <string name="receive_otp_code">Nhận mã OTP</string>
+  <string name="confirm_age_16_or_older">Tôi xác nhận mình đủ 16 tuổi trở lên và chấp nhận với Điều khoản sử dụng</string>
 
   <!--  Verify OTP screen-->
   <string name="step_2">Bước 2/3</string>
@@ -59,6 +60,21 @@
   <string name="password_have_digit_validation">Có chứa ít nhất 1 chữ số</string>
   <string name="password_have_special_character_validation">Có chứa ít nhất 1 kí tự đặc biệt</string>
   <string name="password_must_be_match">Phải giống nhau</string>
+
+  <!--  Registration info-->
+  <string name="personal_info_title">Thông tin cá nhân</string>
+  <string name="guardian_info_title">Thông tin người giám hộ</string>
+  <string name="full_name_label">Họ và tên*</string>
+  <string name="guardian_full_name_label">Họ và tên người giám hộ*</string>
+  <string name="birth_date_label">Ngày sinh*</string>
+  <string name="guardian_birth_date_label">Ngày sinh người giám hộ*</string>
+  <string name="gender_label">Giới tính*</string>
+  <string name="address_label">Địa chỉ*</string>
+  <string name="guardian_phone_label">Số điện thoại người giám hộ*</string>
+  <string name="full_name_hint">Ví dụ: Nguyễn Văn A</string>
+  <string name="birth_date_hint">DD/MM/YYYY</string>
+  <string name="gender_hint">Chọn giới tính</string>
+  <string name="address_hint">Ví dụ: 123 ABC, Bình Hưng, HCM</string>
 
   <!--  Link account-->
   <string name="link_account_title">Liên kết tài khoản</string>

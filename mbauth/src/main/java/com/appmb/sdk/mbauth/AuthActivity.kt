@@ -54,6 +54,10 @@ import com.appmb.sdk.mbauth.ui.passwordinput.LinkPhoneAccountPasswordInputScreen
 import com.appmb.sdk.mbauth.ui.passwordinput.ResetPasswordInputView
 import com.appmb.sdk.mbauth.ui.passwordinput.SignUpPasswordInputScreen
 import com.appmb.sdk.mbauth.ui.phoneinput.PhoneInputView
+import com.appmb.sdk.mbauth.ui.registration.GuardianInfoScreen
+import com.appmb.sdk.mbauth.ui.registration.PersonalInfoScreen
+import com.appmb.sdk.mbauth.ui.registration.RegistrationFlow
+import com.appmb.sdk.mbauth.ui.registration.RegistrationStep
 import com.appmb.sdk.mbauth.ui.server.ServerListScreen
 import com.appmb.sdk.mbauth.ui.server.components.MaintenancePopupView
 import com.appmb.sdk.mbauth.ui.tokenexpiration.TokenExpirationScreen
@@ -424,8 +428,13 @@ fun AppNavigator(
       val otpType = it.arguments?.getString("otpType").orEmpty()
       PhoneInputView(
         otpType = otpType,
-        navigateToVerifyOtp = { phone, timeToRetry ->
-          navController.navigate(route = "VerifyOTP/$phone/$timeToRetry/$otpType")
+        stepLabel = if (otpType == MbAuthParams.OTP_TYPE_PARAM_REGISTRATION) {
+          RegistrationFlow.label(RegistrationStep.Phone, isUnder16 = false)
+        } else {
+          null
+        },
+        navigateToVerifyOtp = { phone, timeToRetry, isUnder16 ->
+          navController.navigate(route = "VerifyOTP/$phone/$timeToRetry/$otpType/$isUnder16")
         },
         onClose = {
           navController.popBackStack()
@@ -437,20 +446,27 @@ fun AppNavigator(
       arguments = listOf(
         navArgument("phone") { type = NavType.StringType },
         navArgument("timeToRetry") { type = NavType.IntType },
-        navArgument("otpType") { type = NavType.StringType }
+        navArgument("otpType") { type = NavType.StringType },
+        navArgument("isUnder16") { type = NavType.BoolType }
       )
     ) {
       val phoneNumber = it.arguments?.getString("phone").orEmpty()
       val timeToRetry = it.arguments?.getInt("timeToRetry") ?: 0
       val otpType = it.arguments?.getString("otpType").orEmpty()
+      val isUnder16 = it.arguments?.getBoolean("isUnder16") ?: false
       OtpInputScreen(
         otpType = otpType,
         phoneNumber = phoneNumber,
         timeToRetry = timeToRetry,
+        stepLabel = if (otpType == MbAuthParams.OTP_TYPE_PARAM_REGISTRATION) {
+          RegistrationFlow.label(RegistrationStep.UserOtp, isUnder16)
+        } else {
+          null
+        },
         onOtpVerifiedSuccess = {
           when (otpType) {
             MbAuthParams.OTP_TYPE_PARAM_REGISTRATION -> {
-              navController.navigate(route = "Register/$phoneNumber")
+              navController.navigate(route = "RegisterPersonalInfo/$phoneNumber/$isUnder16")
             }
 
             MbAuthParams.OTP_TYPE_PARAM_LINK_PHONE_ACCOUNT -> {
@@ -473,16 +489,86 @@ fun AppNavigator(
     }
 
     composable(
-      route = "Register/{phone}",
+      route = RegisterPersonalInfo.NAME,
+      arguments = listOf(
+        navArgument("phone") { type = NavType.StringType },
+        navArgument("isUnder16") { type = NavType.BoolType }
+      )
+    ) {
+      val phoneNumber = it.arguments?.getString("phone").orEmpty()
+      val isUnder16 = it.arguments?.getBoolean("isUnder16") ?: false
+      PersonalInfoScreen(
+        stepLabel = RegistrationFlow.label(RegistrationStep.PersonalInfo, isUnder16),
+        onContinue = {
+          if (isUnder16) {
+            navController.navigate(route = "RegisterGuardianInfo/$phoneNumber")
+          } else {
+            navController.navigate(route = "Register/$phoneNumber/$isUnder16")
+          }
+        },
+        onClose = {
+          navController.popBackStack()
+        }
+      )
+    }
+
+    composable(
+      route = RegisterGuardianInfo.NAME,
       arguments = listOf(
         navArgument("phone") { type = NavType.StringType }
       )
     ) {
       val phoneNumber = it.arguments?.getString("phone").orEmpty()
+      GuardianInfoScreen(
+        stepLabel = RegistrationFlow.label(RegistrationStep.GuardianInfo, isUnder16 = true),
+        onContinue = { guardianPhone, timeToRetry ->
+          navController.navigate(route = "RegisterGuardianOTP/$phoneNumber/$guardianPhone/$timeToRetry")
+        },
+        onClose = {
+          navController.popBackStack()
+        }
+      )
+    }
+
+    composable(
+      route = RegisterGuardianOTP.NAME,
+      arguments = listOf(
+        navArgument("phone") { type = NavType.StringType },
+        navArgument("guardianPhone") { type = NavType.StringType },
+        navArgument("timeToRetry") { type = NavType.IntType }
+      )
+    ) {
+      val phoneNumber = it.arguments?.getString("phone").orEmpty()
+      val guardianPhone = it.arguments?.getString("guardianPhone").orEmpty()
+      val timeToRetry = it.arguments?.getInt("timeToRetry") ?: 0
+      OtpInputScreen(
+        otpType = MbAuthParams.OTP_TYPE_PARAM_REGISTRATION,
+        phoneNumber = guardianPhone,
+        timeToRetry = timeToRetry,
+        stepLabel = RegistrationFlow.label(RegistrationStep.GuardianOtp, isUnder16 = true),
+        onOtpVerifiedSuccess = {
+          navController.navigate(route = "Register/$phoneNumber/true")
+        },
+        onClose = {
+          navController.popBackStack()
+        }
+      )
+    }
+
+    composable(
+      route = Register.NAME,
+      arguments = listOf(
+        navArgument("phone") { type = NavType.StringType },
+        navArgument("isUnder16") { type = NavType.BoolType }
+      )
+    ) {
+      val phoneNumber = it.arguments?.getString("phone").orEmpty()
+      val isUnder16 = it.arguments?.getBoolean("isUnder16") ?: false
       SignUpPasswordInputScreen(
         activity = navController.context as ComponentActivity,
         authViewModel = koinViewModel<AuthViewModel>(parameters = { parametersOf(gameId) }),
         phoneNumber = phoneNumber,
+        stepLabel = RegistrationFlow.label(RegistrationStep.Password, isUnder16),
         navigateToChooseServer = {
           navController.navigateWithoutBackStack(ChooseServer)
         },
