@@ -1,0 +1,146 @@
+[versions]
+adjustAndroid = "5.5.0"
+adjustAndroidHuaweiReferrer = "5.0.0"
+adjustAndroidSamsungReferrer = "5.5.0"
+adjustAndroidXiaomiReferrer = "5.5.0"
+agp = "7.4.2"
+androidTools = "31.4.2"
+androidDesugarJdkLibs = "2.1.3"
+androidxComposeCompiler = "1.4.8"
+arrow = "1.2.0"
+datastore = "1.0.0"
+installreferrer = "2.2"
+kotlin = "1.8.22"
+ktor = "2.3.0"
+gson = "2.10.1"
+koin = "3.4.0"
+coreKtx = "1.9.0"
+junit = "4.13.2"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+mockito = "5.1.1"
+mockitoKotlin = "5.1.0"
+kotlinxCoroutinesTest = "1.7.3"
+lifecycleRuntimeKtx = "2.5.1"
+lifecycleBom = "2.5.1"
+activityCompose = "1.7.0"
+composeBom = "2023.03.00"
+appcompat = "1.5.1"
+localbroadcastmanager = "1.1.0"
+material = "1.9.0"
+navigation = "2.5.3"
+mbcoresdk = "1.0.0"
+mbscoreuidk = "1.0.0"
+credentials = " 1.0.0-alpha09"
+googleid = "1.0.0"
+facebookLogin = "16.0.0"
+mixpanelAndroid = "7.5.4"
+boltsAndroid = "1.4.0"
+androidxWork = "2.7.1"
+google_billing = "7.1.1"
+#Firebase services
+firebase-bom = "31.2.3"
+google-services = "4.4.0"
+crashlytics-gradle = "2.9.9"
+play-services = "18.4.0"
+play-services-auth = "21.0.0"
+playServicesAdsIdentifier = "18.0.1"
+pullToRefresh = "1.2.0"
+firebaseCrashlytics = "18.6.2"
+tiktok-business-sdk = "1.4.0"
+
+[libraries]
+adjust-android = { module = "com.adjust.sdk:adjust-android", version.ref = "adjustAndroid" }
+adjust-android-huawei-referrer = { module = "com.adjust.sdk:adjust-android-huawei-referrer", version.ref = "adjustAndroidHuaweiReferrer" }
+android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
+android-tools-common = { group = "com.android.tools", name = "common", version.ref = "androidTools" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-localbroadcastmanager = { module = "androidx.localbroadcastmanager:localbroadcastmanager", version.ref = "localbroadcastmanager" }
+installreferrer = { module = "com.android.installreferrer:installreferrer", version.ref = "installreferrer" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
+mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+lifecycle-bom = { group = "androidx.lifecycle", name = "lifecycle-bom", version.ref = "lifecycleBom" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui"}
+
+androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling"}
+androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview"}
+androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
+androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
+arrow-kt-core = { group = "io.arrow-kt", name = "arrow-core", version.ref = "arrow" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
+google-billing = { group = "com.android.billingclient", name = "billing-ktx", version.ref = "google_billing" }
+androidx-work = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "androidxWork" }
+google-play-services-base = { group = "com.google.android.gms", name = "play-services-base", version.ref = "play-services"}
+
+koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
+koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
+koin-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
+#koin-compose-viewmodel = { group = "io.insert-koin", name = "koin-compose-viewmodel", version.ref = "koin" }
+
+kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+
+ktor-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
+ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
+ktor-client-auth = { group = "io.ktor", name = "ktor-client-auth", version.ref = "ktor" }
+
+#implementation("com.google.code.gson:gson:2.10.1")
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+
+mixpanel-android = { module = "com.mixpanel.android:mixpanel-android", version.ref = "mixpanelAndroid" }
+bolts-android = {module = "com.parse.bolts:bolts-android", version.ref = "boltsAndroid"}
+
+# Google Signin
+androidx-credential = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
+androidx-credential-service-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
+androidx-identity-googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
+
+# Google signin for below android 14
+android-google-signin = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "play-services-auth"}
+
+
+# Facebook Signin
+facebook-login = { group = "com.facebook.android", name = "facebook-login", version.ref = "facebookLogin" }
+facebook-core = { group = "com.facebook.android", name = "facebook-core", version.ref = "facebookLogin" }
+
+# Firebase service
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics-ndk" }
+# sdk core
+mb-core-sdk = { group = "com.appmb.sdk", name = "mbcore", version.ref = "mbcoresdk" }
+mb-core-ui-sdk = { group = "com.appmb.sdk", name = "mbcoreui", version.ref = "mbscoreuidk" }
+play-services-ads-identifier = { module = "com.google.android.gms:play-services-ads-identifier", version.ref = "playServicesAdsIdentifier" }
+adjust-android-xiaomi-referrer = { module = "com.adjust.sdk:adjust-android-xiaomi-referrer", version.ref = "adjustAndroidXiaomiReferrer" }
+adjust-android-samsung-referrer = { module = "com.adjust.sdk:adjust-android-samsung-referrer", version.ref = "adjustAndroidSamsungReferrer" }
+tiktok-business-sdk = { module = "com.github.tiktok:tiktok-business-android-sdk", version.ref = "tiktok-business-sdk" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+#kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+kotlinx-serialization-plugin = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin"}
+parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
+# Plugins defined by this project
+com-appmb-android-application = { id = "com.appmb.android.application", version = "unspecified" }
+com-appmb-android-application-compose = { id = "com.appmb.android.application.compose", version = "unspecified" }
+com-appmb-android-library = { id = "com.appmb.android.library", version = "unspecified" }
+com-appmb-android-sdk = { id = "com.appmb.android.sdk", version = "unspecified" }
+google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
+crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlytics-gradle" }

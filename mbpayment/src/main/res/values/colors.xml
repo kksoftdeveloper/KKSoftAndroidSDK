@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <color name="background_package_item">#9F8153</color>
+  <color name="background_package_disable_item">#6B5D4D</color>
+  <color name="outlined_text_border_color">#450000</color>
+</resources>

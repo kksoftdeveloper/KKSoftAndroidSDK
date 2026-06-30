@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+  <uses-permission android:name="android.permission.INTERNET" />
+  <application>
+    <meta-data
+      android:name="com.mixpanel.android.MPConfig.FlushOnBackground"
+      android:value="false" />
+    <meta-data
+      android:name="com.mixpanel.android.MPConfig.EnableDebugLogging"
+      android:value="true" />
+  </application>
+</manifest>

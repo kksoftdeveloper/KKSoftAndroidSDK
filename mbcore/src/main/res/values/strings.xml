@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="success">Thành công</string>
+    <string name="auth_match_error">Thông tin nhập chưa đúng</string>
+    <string name="auth_password_validation_error">Mật khẩu phải giống nhau và thoả các đều kiện</string>
+    <string name="auth_otp_error">Xác thực mã xác thực lỗi</string>
+    <string name="auth_otp_expired">Mã xác thực đã hết hạn</string>
+    <string name="auth_otp_request_many_time">Quá nhiều yêu cầu mã xác thực. Vui lòng thử lại sau 60 giây.</string>
+    <string name="auth_duplicated_phone_error">Số điện thoại đã được đăng ký</string>
+    <string name="auth_invalid_phone_error">Số điện thoại chưa được đăng ký hoặc lỗi xác thực mã xác thực</string>
+    <string name="auth_account_not_exist">Tài khoản chưa được đăng ký</string>
+    <string name="auth_account_deactivated">Tài khoản của bạn đã yêu cầu xóa nên không đăng nhập được. Liên hệ CSKH: support@kksoft.vn</string>
+    <string name="auth_otp_invalid">Mã xác thực không đúng</string>
+    <string name="auth_phone_pass_invalid">Tên đăng nhập hoặc mật khẩu không đúng.</string>
+    <string name="auth_token_expired">Hết thời gian truy cập</string>
+    <string name="auth_new_password_repeated">Mật khẩu mới không được trùng mật khẩu cũ</string>
+    <string name="auth_unauthorized">Chưa được xác thực</string>
+    <string name="auth_unknown_supported">Phương thức chưa được hỗ trợ</string>
+    <string name="auth_unknown_error">Đã xảy ra lỗi.</string>
+    <string name="auth_app_not_found">Game chưa được đăng ký</string>
+    <string name="auth_app_not_configured">Game chưa hoàn thành cấu hình</string>
+    <string name="auth_app_not_configured_game">Game chưa cài đặt cấu hình</string>
+    <string name="auth_app_not_configured_game_server">Chưa cài đặt Game Server</string>
+    <string name="auth_app_not_configured_facebook">Game chưa cài đặt cấu hình Facebook app</string>
+    <string name="auth_app_not_configured_google">Game chưa cài đặt cấu hình Google social</string>
+    <string name="auth_social_user_cancel">Bạn đã huỷ đăng nhập với mạng xã hội</string>
+    <string name="GoogleUnknownError">Lỗi đăng nhập với Google</string>
+    <string name="GoogleAuthenticateError">Đăng nhập trên Facebook đã xảy ra lỗi</string>
+    <string name="FacebookUnknownError">Lỗi đăng nhập với Facebook</string>
+    <string name="FacebookAuthenticateError">Đăng nhập trên Facebook đã xảy ra lỗi</string>
+    <string name="SDKNotInitialized">Authentication SDK chưa được khởi tạo</string>
+    <string name="SDKSignatureError">Lỗi tạo chữ ký</string>
+    <string name="SocialAccountLinked">Tài khoản đã được liên kết</string>
+    <string name="google_play_service_unavailable">Google play chưa sẳn sàng.</string>
+    <string name="NotFound">Tài khoản đã bị xoá hoặc không tồn tại</string>
+</resources>

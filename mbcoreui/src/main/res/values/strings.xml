@@ -1,0 +1,133 @@
+<resources>
+  <string name="welcome_back">Welcome Back!</string>
+  <string name="login_to_continue">Please login to continue</string>
+  <string name="phone_number_label">Số điện thoại</string>
+  <string name="enter_phone_number_label">Enter your phone number</string>
+  <string name="password_label">Mật khẩu</string>
+  <string name="enter_password_hint">Nhập mật khẩu</string>
+  <string name="reenter_password_hint">Nhập lại mật khẩu</string>
+  <string name="enter_password_label">Enter your password</string>
+  <string name="accept_terms">Tôi đồng ý với điều kiện và điều khoản</string>
+  <string name="login">Đăng nhập</string>
+  <string name="or_continue_with">Hoặc đăng nhập bằng</string>
+  <string name="continue_with_google">Continue with Google</string>
+  <string name="continue_with_facebook">Continue with Facebook</string>
+  <string name="play_as_guest">Chơi ngay</string>
+  <string name="dont_have_account">Không có tài khoản?</string>
+  <string name="sign_up_now">Đăng ký ngay</string>
+  <string name="sign_up">Đăng ký</string>
+  <string name="forgot_password">Quên mật khẩu?</string>
+  <string name="google">Google</string>
+  <string name="facebook">Facebook</string>
+  <string name="update">Cập nhật</string>
+
+
+  <!--  Error message for api status code-->
+  <string name="common_error">Đã có lỗi xảy ra</string>
+  <string name="error_message_phone_already_linked">SĐT này đã được sử dụng</string>
+  <string name="error_message_send_otp_too_much">Vui lòng thử lại sau 1 phút</string>
+  
+  <string name="phone_input_with_unknown_error">Hệ thống đang gặp sự cố. Vui lòng thử lại sau</string>
+
+  <!--  Input phone number screen-->
+  <string name="step_1">Bước 1/3</string>
+  <string name="enter_phone_number">Nhập SĐT của bạn</string>
+  <string name="we_will_send_you_a_verification_code">Chúng tôi sẽ gửi cho bạn mã xác thực</string>
+  <string name="common_continue">Tiếp tục</string>
+  <string name="phone_number_hint">(+84) 912 345 6780</string>
+  <string name="receive_otp_code">Nhận mã OTP</string>
+
+  <!--  Verify OTP screen-->
+  <string name="step_2">Bước 2/3</string>
+  <string name="enter_verification_code">Nhập mã xác thực</string>"
+  <string name="verify_code">Verify Code</string>
+  <string name="send_otp_notification">Chúng tôi vừa gửi mã xác thực gồm 6 chữ số đến SĐT %s. Vui lòng nhập để tiếp tục </string>
+  <string name="resend_otp">Nhận lại mã</string>
+  <string name="incorrect_otp">Mã xác thực sai. Vui lòng thử lại</string>
+  <string name="try_again">Vui lòng thử lại</string>
+  <string name="otp_resend_timer">Gửi lại mã trong</string>
+
+  <!--  Setup Password screen-->
+  <string name="step_3">Bước 3/3</string>
+  <string name="common_accept">Xác nhận</string>
+  <string name="set_up_your_password">Cài đặt mật khẩu</string>
+  <string name="confirm_pwd_label">Nhập lại mật khẩu</string>
+  <!--  Reset password-->
+  <string name="reset_password">Cài đặt lại mật khẩu</string>
+  <!--  Password validation-->
+  <string name="password_length_validation">Không được bé hơn 8 kí tự</string>
+  <string name="password_have_digit_validation">Có chứa ít nhất 1 chữ số</string>
+  <string name="password_have_special_character_validation">Có chứa ít nhất 1 kí tự đặc biệt</string>
+  <string name="password_must_be_match">Phải giống nhau</string>
+
+  <!--  Link account-->
+  <string name="link_account_title">Liên kết tài khoản</string>
+  <string name="link_account_subtitle">Liên kết tài khoản của bạn với những phương thức bên dưới</string>
+  <string name="link_account_with_google">Google</string>
+  <string name="link_account_with_facebook">Facebook</string>
+  <string name="link_account_with_phone">Số điện thoại</string>
+
+  <!--  Force udpate-->
+  <string name="reminder_update_title">Đã có phiên bản cập nhật mới</string>
+  <string name="reminder_update_mesage">Đại hiệp vui lòng cập nhật để có được trải nghiệm tốt nhất</string>
+
+  <!--  User Blocked-->
+  <string name="user_blocked_title">Tài khoản bị khoá.</string>
+  <string name="user_blocked_mesage">Hiện tại, tài khoản của bạn bị khoá vì vi phạm điều kiện và chính sách bảo mật. Quý đại hiệp vui lòng thông tin chi tiết đến %1$s hoặc liên hệ %2$s.</string>
+
+  <!--  Logout-->
+  <string name="confirm_logout">Xác nhận đăng xuất</string>
+  <string name="confirm_logout_message">Bạn có muốn đăng xuất?</string>
+
+  <!--  Expiration-->
+  <string name="confirm_expiration">Phiên đăng nhập đã hết hạn</string>
+  <string name="confirm_expiration_message">Vui lòng đăng nhập lại để tiếp tục sử dụng.</string>
+  <string name="confirm">Xác nhận</string>
+
+  <!--  Deactivate-->
+  <string name="account_deletion_title">Xóa Tài khoản</string>
+  <string name="account_deletion_guide">Hướng dẫn chi tiết về xóa tài khoản, vui lòng đọc kỹ trước khi thực hiện</string>
+  <string name="account_deletion_notice">— Thông báo về việc xoá tài khoản, vui lòng đọc kỹ chi tiết trước khi tiến hành xoá —</string>
+
+  <string name="account_deletion_warning_1">• Sau khi xóa tài khoản, bạn sẽ không thể truy cập vào trang web, trò chơi và các dịch vụ cho thành viên của chúng tôi.</string>
+  <string name="account_deletion_warning_2">• Tài khoản sau khi hoàn thành việc xóa tài khoản sẽ không thể được khôi phục. Cần lưu ý các nhân vật trong trò chơi, đồ vật, kim cương, vật phẩm liên quan… sẽ bị xóa bỏ, các sản phẩm đã mua qua hệ thống Google Play / Appstore… sẽ không được hoàn tiền.</string>
+  <string name="account_deletion_warning_3">• Bạn sẽ không có quyền truy cập vào tài khoản đã xóa ở bất kỳ dịch vụ nào của hệ thống KKSoft.</string>
+  <string name="account_deletion_warning_4">• Việc xóa tài khoản theo quy định của Nhà nước Việt Nam sẽ tuân thủ các điều khoản liên quan đến quyền riêng tư, bảo vệ dữ liệu cá nhân và quản lý dịch vụ trực tuyến.</string>
+
+  <string name="account_deletion_cancel_notice">— Có thể yêu cầu hủy xóa tài khoản trong vòng 7 ngày  —</string>
+  <string name="account_deletion_cancel_info_1">• Bạn có thể gửi yêu cầu xem xét huỷ yêu cầu xoá tài khoản trong vòng 7 ngày.</string>
+  <string name="account_deletion_cancel_info_2">• Nếu vượt quá thời gian quy định, tài khoản sẽ không thể được khôi phục.</string>
+
+  <string name="account_deletion_agreement">Tôi đã đọc và đồng ý với toàn bộ nội dung, xác nhận xoá tài khoản.</string>
+
+  <!--  Choose server Resource-->
+  <string name="choose_server">Chọn Server</string>
+  <string name="status_full">Đầy</string>
+  <string name="status_new">Mới</string>
+  <string name="status_good">Online</string>
+  <string name="status_maintenance">Đang bảo trì</string>
+  <string name="status_offline">Sắp mở</string>
+  <string name="access_game_button_label">Vào game</string>
+
+  <!--  Server maintanence-->
+  <string name="maintenance">Đang bảo trì</string>
+  <string name="fanpage_label">Fanpage</string>
+  <string name="customer_service_label">CSKH</string>
+  <string name="maintenance_message">Hiện tại tất cả Server đang tiến hành bảo trì.
+    Quý đại hiệp vui lòng thử lại .sau.
+    Thông tin chi tiết vui lòng theo dõi Fanpage hoặc liên hệ CSKH. Chân thành xin lỗi vì sự bất tiện này.</string>
+
+  <!--  PAYMENT RESOURCE-->
+  <!--  Popup purchase result-->
+  <string name="common_close">Đóng</string>
+  <string name="common_retry">Thử lại</string>
+  <string name="payment_purchase_title_successfully">Thanh toán thành công</string>
+  <string name="payment_purchase_title_failed">Thanh toán thất bại</string>
+  <string name="payment_purchase_message_successfully">Chúc mừng đại hiệp mua thành công %s và đã được gửi vào túi hành lí.</string>
+  <string name="payment_purchase_message_failed">Thanh toán thất bại. Vui lòng kiểm tra lại phương thức thanh toán hoặc tiến hành thanh toán lại.</string>
+  <string name="payment_purchase_unavailable_in_selected_server">Thanh toán thất bại. Vui lòng chơi trên máy chủ khác để tiếp tục mua vật phẩm này.</string>
+
+  <string name="account_or_device_has_been_deleted">Tài khoản bị xoá hoặc không tìm thấy.</string>
+
+  <string name="offline_banner_message">Không có kết nối mạng.</string>
+</resources>

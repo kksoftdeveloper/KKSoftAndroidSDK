@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="game_currency_unit">Điểm</string>
+  <string name="discount">Giảm giá</string>
+  <string name="error_message_require_google_play_services">Vui lòng cài đặt/cập nhật Google Play Services</string>
+  <string name="error_message_not_supported_marketplace">Vật phẩm chưa hỗ trợ mua tại quốc gia này.</string>
+  <string name="error_message_not_supported_user">Bạn chưa thể mua vật phẩm này. Xin lỗi vì sự bất tiện này.</string>
+  <string name="knb_store">Cửa hàng Điểm Nuốt Chửng</string>
+</resources>

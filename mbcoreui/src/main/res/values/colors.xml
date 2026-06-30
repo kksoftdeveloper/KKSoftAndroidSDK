@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <color name="purple_200">#FFBB86FC</color>
+  <color name="purple_500">#FF6200EE</color>
+  <color name="purple_700">#FF3700B3</color>
+  <color name="teal_200">#FF03DAC5</color>
+  <color name="teal_700">#FF018786</color>
+  <color name="black">#FF000000</color>
+  <color name="white">#FFFFFFFF</color>
+  <color name="brown">#4E1F0B</color>
+  <color name="gray_text_color">#2c2c2c</color>
+  <color name="gray_text_button_disabled">#2C2C2C80</color>
+  <color name="input_background_color">#302222</color>
+  <color name="blue_checkbox_color">#2A85FF</color>
+  <color name="dark_gray_title">#424242</color>
+  <color name="brown_button_background">#532E2E</color>
+  <color name="blue_text_link_color">#1677FF</color>
+  <color name="background_server_item">#EFE0B3</color>
+  <color name="gray_text_disabled">#4E4E4E</color>
+  <color name="color_server_full">#C20000</color>
+  <color name="color_server_new">#DDC300</color>
+  <color name="color_server_good">#00C314</color>
+  <color name="color_server_maintenance">#001EFF</color>
+  <color name="color_server_offline">#474747</color>
+  <color name="red_error">#FF4D4F</color>
+
+</resources>
