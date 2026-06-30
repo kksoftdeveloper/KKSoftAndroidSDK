@@ -2,6 +2,7 @@
   <string name="welcome_back">Welcome Back!</string>
   <string name="login_to_continue">Please login to continue</string>
   <string name="phone_number_label">Số điện thoại</string>
+  <string name="phone_number_invalid">Số điện thoại không hợp lệ</string>
   <string name="enter_phone_number_label">Enter your phone number</string>
   <string name="password_label">Mật khẩu</string>
   <string name="enter_password_hint">Nhập mật khẩu</string>
@@ -73,7 +74,12 @@
   <string name="guardian_phone_label">Số điện thoại người giám hộ*</string>
   <string name="full_name_hint">Ví dụ: Nguyễn Văn A</string>
   <string name="birth_date_hint">DD/MM/YYYY</string>
+  <string name="birth_date_invalid_day">Ngày không hợp lệ</string>
+  <string name="birth_date_invalid_month">Tháng không hợp lệ</string>
   <string name="gender_hint">Chọn giới tính</string>
+  <string name="gender_male">Nam</string>
+  <string name="gender_female">Nữ</string>
+  <string name="gender_other">Khác</string>
   <string name="address_hint">Ví dụ: 123 ABC, Bình Hưng, HCM</string>
 
   <!--  Link account-->

@@ -437,7 +437,11 @@ fun AppNavigator(
           navController.navigate(route = "VerifyOTP/$phone/$timeToRetry/$otpType/$isUnder16")
         },
         onClose = {
-          navController.popBackStack()
+          if (otpType == MbAuthParams.OTP_TYPE_PARAM_REGISTRATION) {
+            (navController.context as? ComponentActivity)?.finish()
+          } else {
+            navController.popBackStack()
+          }
         }
       )
     }
@@ -483,7 +487,11 @@ fun AppNavigator(
           }
         },
         onClose = {
-          navController.popBackStack()
+          if (otpType == MbAuthParams.OTP_TYPE_PARAM_REGISTRATION) {
+            (navController.context as? ComponentActivity)?.finish()
+          } else {
+            navController.popBackStack()
+          }
         }
       )
     }
@@ -507,7 +515,7 @@ fun AppNavigator(
           }
         },
         onClose = {
-          navController.popBackStack()
+          (navController.context as? ComponentActivity)?.finish()
         }
       )
     }
@@ -525,7 +533,7 @@ fun AppNavigator(
           navController.navigate(route = "RegisterGuardianOTP/$phoneNumber/$guardianPhone/$timeToRetry")
         },
         onClose = {
-          navController.popBackStack()
+          (navController.context as? ComponentActivity)?.finish()
         }
       )
     }
@@ -550,7 +558,7 @@ fun AppNavigator(
           navController.navigate(route = "Register/$phoneNumber/true")
         },
         onClose = {
-          navController.popBackStack()
+          (navController.context as? ComponentActivity)?.finish()
         }
       )
     }
@@ -573,7 +581,7 @@ fun AppNavigator(
           navController.navigateWithoutBackStack(ChooseServer)
         },
         onClose = {
-          navController.popBackStack()
+          (navController.context as? ComponentActivity)?.finish()
         }
       ).Content()
     }

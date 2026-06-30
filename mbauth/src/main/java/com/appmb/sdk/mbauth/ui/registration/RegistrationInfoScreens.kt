@@ -1,8 +1,16 @@
 package com.appmb.sdk.mbauth.ui.registration
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -14,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.appmb.sdk.mbauth.model.MbAuthParams
@@ -34,12 +43,14 @@ fun PersonalInfoScreen(
 ) {
   var fullName by rememberSaveable { mutableStateOf("") }
   var birthDate by rememberSaveable { mutableStateOf("") }
+  var birthDateError by rememberSaveable { mutableStateOf<String?>(null) }
   var gender by rememberSaveable { mutableStateOf("") }
   var address by rememberSaveable { mutableStateOf("") }
+  val invalidDayError = stringResource(R.string.birth_date_invalid_day)
+  val invalidMonthError = stringResource(R.string.birth_date_invalid_month)
   val canContinue = fullName.isNotBlank() &&
-    birthDate.isNotBlank() &&
-    gender.isNotBlank() &&
-    address.isNotBlank()
+    birthDate.isCompleteBirthDate() &&
+    birthDateError == null
 
   MbAuthFrameContainer(
     buttonLabel = stringResource(R.string.common_continue),
@@ -57,16 +68,30 @@ fun PersonalInfoScreen(
       placeholder = stringResource(R.string.full_name_hint),
       onValueChange = { fullName = it }
     )
-    RegistrationField(
+    BirthDateField(
       label = stringResource(R.string.birth_date_label),
       value = birthDate,
-      placeholder = stringResource(R.string.birth_date_hint),
-      onValueChange = { birthDate = it }
+      error = birthDateError,
+      onValueChange = { value ->
+        val result = formatBirthDateInput(
+          previousValue = birthDate,
+          newValue = value,
+          invalidDayError = invalidDayError,
+          invalidMonthError = invalidMonthError,
+        )
+        birthDate = result.value
+        birthDateError = result.error
+      }
     )
-    RegistrationField(
+    GenderDropdownField(
       label = stringResource(R.string.gender_label),
       value = gender,
       placeholder = stringResource(R.string.gender_hint),
+      options = listOf(
+        stringResource(R.string.gender_male),
+        stringResource(R.string.gender_female),
+        stringResource(R.string.gender_other),
+      ),
       onValueChange = { gender = it }
     )
     RegistrationField(
@@ -88,12 +113,17 @@ fun GuardianInfoScreen(
   val requestOtpState = viewModel.requestOtpState.collectAsState()
   var fullName by rememberSaveable { mutableStateOf("") }
   var birthDate by rememberSaveable { mutableStateOf("") }
+  var birthDateError by rememberSaveable { mutableStateOf<String?>(null) }
   var phone by rememberSaveable { mutableStateOf("") }
   var address by rememberSaveable { mutableStateOf("") }
+  val invalidDayError = stringResource(R.string.birth_date_invalid_day)
+  val invalidMonthError = stringResource(R.string.birth_date_invalid_month)
+  val invalidPhoneError = stringResource(R.string.phone_number_invalid)
+  val phoneError = if (phone.isNotBlank() && !phone.isValidVietnamPhoneNumber()) invalidPhoneError else null
   val canContinue = fullName.isNotBlank() &&
-    birthDate.isNotBlank() &&
-    phone.isNotBlank() &&
-    address.isNotBlank()
+    birthDate.isCompleteBirthDate() &&
+    birthDateError == null &&
+    phone.isValidVietnamPhoneNumber()
 
   when (val state = requestOtpState.value) {
     is RequestOtpState.Success -> {
@@ -128,11 +158,20 @@ fun GuardianInfoScreen(
       placeholder = stringResource(R.string.full_name_hint),
       onValueChange = { fullName = it }
     )
-    RegistrationField(
+    BirthDateField(
       label = stringResource(R.string.guardian_birth_date_label),
       value = birthDate,
-      placeholder = stringResource(R.string.birth_date_hint),
-      onValueChange = { birthDate = it }
+      error = birthDateError,
+      onValueChange = { value ->
+        val result = formatBirthDateInput(
+          previousValue = birthDate,
+          newValue = value,
+          invalidDayError = invalidDayError,
+          invalidMonthError = invalidMonthError,
+        )
+        birthDate = result.value
+        birthDateError = result.error
+      }
     )
     RegistrationField(
       label = stringResource(R.string.guardian_phone_label),
@@ -144,6 +183,19 @@ fun GuardianInfoScreen(
         }
       }
     )
+    if (!phoneError.isNullOrBlank()) {
+      BasicText(
+        text = phoneError,
+        style = TextStyle(
+          color = MaterialTheme.colorScheme.error,
+          fontFamily = CustomFont.fzPoppinsFont,
+          fontSize = 10.sp,
+        ),
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(top = 2.dp)
+      )
+    }
     RegistrationField(
       label = stringResource(R.string.address_label),
       value = address,
@@ -197,3 +249,199 @@ private fun RegistrationField(
     placeholder = placeholder,
   )
 }
+
+@Composable
+private fun GenderDropdownField(
+  label: String,
+  value: String,
+  placeholder: String,
+  options: List<String>,
+  onValueChange: (String) -> Unit,
+) {
+  var expanded by rememberSaveable { mutableStateOf(false) }
+
+  BasicText(
+    text = label,
+    style = TextStyle(
+      color = colorResource(R.color.black),
+      fontFamily = CustomFont.fzPoppinsFont,
+      fontSize = 12.sp,
+    ),
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(top = 4.dp)
+  )
+  Box(
+    modifier = Modifier
+      .fillMaxWidth()
+      .clickable { expanded = true }
+  ) {
+    TextInputField(
+      textFieldValue = value,
+      onValueChange = {},
+      placeholder = placeholder,
+      modifier = Modifier.clickable { expanded = true },
+    )
+    Icon(
+      imageVector = Icons.Default.KeyboardArrowDown,
+      contentDescription = null,
+      tint = colorResource(R.color.white),
+      modifier = Modifier
+        .align(Alignment.CenterEnd)
+        .padding(end = 12.dp, top = 4.dp)
+    )
+    DropdownMenu(
+      expanded = expanded,
+      onDismissRequest = { expanded = false },
+      modifier = Modifier.fillMaxWidth()
+    ) {
+      options.forEach { option ->
+        DropdownMenuItem(
+          text = {
+            Text(
+              text = option,
+              fontFamily = CustomFont.fzPoppinsFont,
+              fontSize = 12.sp,
+            )
+          },
+          onClick = {
+            onValueChange(option)
+            expanded = false
+          }
+        )
+      }
+    }
+  }
+}
+
+@Composable
+private fun BirthDateField(
+  label: String,
+  value: String,
+  error: String?,
+  onValueChange: (String) -> Unit,
+) {
+  RegistrationField(
+    label = label,
+    value = value,
+    placeholder = stringResource(R.string.birth_date_hint),
+    onValueChange = onValueChange
+  )
+  if (!error.isNullOrBlank()) {
+    BasicText(
+      text = error,
+      style = TextStyle(
+        color = MaterialTheme.colorScheme.error,
+        fontFamily = CustomFont.fzPoppinsFont,
+        fontSize = 10.sp,
+      ),
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(top = 2.dp)
+    )
+  }
+}
+
+private data class BirthDateInputResult(
+  val value: String,
+  val error: String? = null,
+)
+
+private fun formatBirthDateInput(
+  previousValue: String,
+  newValue: String,
+  invalidDayError: String,
+  invalidMonthError: String,
+): BirthDateInputResult {
+  if (newValue.length < previousValue.length) {
+    val sanitizedValue = newValue.filter { it.isDigit() || it == '/' }.take(10)
+    return BirthDateInputResult(
+      value = sanitizedValue,
+      error = validateBirthDate(sanitizedValue, invalidDayError, invalidMonthError)
+    )
+  }
+
+  if (newValue.any { !it.isDigit() && it != '/' }) {
+    return BirthDateInputResult(previousValue)
+  }
+
+  val digits = newValue.filter { it.isDigit() }.take(8)
+  val validationError = validateBirthDateDigits(
+    digits = digits,
+    invalidDayError = invalidDayError,
+    invalidMonthError = invalidMonthError
+  )
+  if (validationError != null) {
+    return BirthDateInputResult(previousValue, validationError)
+  }
+
+  return BirthDateInputResult(formatBirthDateDigits(digits))
+}
+
+private fun validateBirthDate(value: String, invalidDayError: String, invalidMonthError: String): String? {
+  val digits = value.filter { it.isDigit() }
+  return validateBirthDateDigits(digits, invalidDayError, invalidMonthError)
+}
+
+private fun validateBirthDateDigits(
+  digits: String,
+  invalidDayError: String,
+  invalidMonthError: String,
+): String? {
+  if (digits.length == 1 && (digits[0].digitToIntOrNull() ?: 0) > 3) {
+    return invalidDayError
+  }
+
+  val day = if (digits.length >= 2) digits.substring(0, 2).toIntOrNull() else null
+  if (day != null && day !in 1..31) {
+    return invalidDayError
+  }
+
+  if (digits.length == 3 && (digits[2].digitToIntOrNull() ?: 0) > 1) {
+    return invalidMonthError
+  }
+
+  val month = if (digits.length >= 4) digits.substring(2, 4).toIntOrNull() else null
+  if (month != null && month !in 1..12) {
+    return invalidMonthError
+  }
+
+  if (day != null && month != null) {
+    val year = if (digits.length >= 8) digits.substring(4, 8).toIntOrNull() else null
+    val maxDay = maxDayOfMonth(month, year)
+    if (day > maxDay) {
+      return invalidDayError
+    }
+  }
+
+  return null
+}
+
+private fun formatBirthDateDigits(digits: String): String =
+  buildString {
+    digits.forEachIndexed { index, char ->
+      if (index == 2 || index == 4) {
+        append('/')
+      }
+      append(char)
+    }
+    if (digits.length == 2 || digits.length == 4) {
+      append('/')
+    }
+  }
+
+private fun String.isCompleteBirthDate(): Boolean =
+  length == 10 && validateBirthDate(this, invalidDayError = "", invalidMonthError = "") == null
+
+private fun maxDayOfMonth(month: Int, year: Int?): Int =
+  when (month) {
+    2 -> if (year == null || isLeapYear(year)) 29 else 28
+    4, 6, 9, 11 -> 30
+    else -> 31
+  }
+
+private fun isLeapYear(year: Int): Boolean =
+  year % 400 == 0 || (year % 4 == 0 && year % 100 != 0)
+
+private fun String.isValidVietnamPhoneNumber(): Boolean =
+  Regex("""^(?:\+?84|0)([35789])\d{8}$""").matches(this)
