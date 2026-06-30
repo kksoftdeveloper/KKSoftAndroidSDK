@@ -9,6 +9,9 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,9 +46,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -60,7 +68,7 @@ import com.appmb.sdk.mbtracking.TrackingSdk
 import org.koin.java.KoinJavaComponent
 import com.appmb.sdk.mbcoreui.R as CoreUiR
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun MbAuthFrameContainer(
   buttonLabel: String,
@@ -72,6 +80,8 @@ fun MbAuthFrameContainer(
 ) {
   val activity = LocalContext.current as? Activity
   val configuration = LocalConfiguration.current
+  val focusManager = LocalFocusManager.current
+  val keyboardController = LocalSoftwareKeyboardController.current
   var logoClickCount by remember { mutableStateOf(0) }
   var showTrackingDialog by remember { mutableStateOf(false) }
 
@@ -102,7 +112,17 @@ fun MbAuthFrameContainer(
       .imeNestedScroll()
   }
   Box(
-    modifier = containerModifier,
+    modifier = containerModifier.pointerInput(Unit) {
+      awaitEachGesture {
+        val down = awaitFirstDown(pass = PointerEventPass.Final)
+        if (down.isConsumed) return@awaitEachGesture
+        val up = waitForUpOrCancellation(pass = PointerEventPass.Final)
+        if (up != null && !up.isConsumed) {
+          focusManager.clearFocus()
+          keyboardController?.hide()
+        }
+      }
+    },
     contentAlignment = Alignment.Center
 
   ) {

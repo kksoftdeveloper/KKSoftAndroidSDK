@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -26,11 +27,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.toSize
@@ -287,15 +291,15 @@ private fun GenderDropdownField(
   Box(
     modifier = Modifier
       .fillMaxWidth()
-      .onGloballyPositioned { coordinates ->
-        fieldSize = coordinates.size.toSize()
-      }
       .clickable { expanded = true }
   ) {
     Box(
       modifier = Modifier
         .fillMaxWidth()
         .padding(top = 4.dp)
+        .onGloballyPositioned { coordinates ->
+          fieldSize = coordinates.size.toSize()
+        }
         .heightIn(min = 32.dp)
         .background(
           color = colorResource(R.color.input_background_color),
@@ -353,11 +357,59 @@ private fun BirthDateField(
   error: String?,
   onValueChange: (String) -> Unit,
 ) {
-  RegistrationField(
-    label = label,
-    value = value,
-    placeholder = stringResource(R.string.birth_date_hint),
-    onValueChange = onValueChange
+  BasicText(
+    text = label,
+    style = TextStyle(
+      color = colorResource(R.color.black),
+      fontFamily = CustomFont.fzPoppinsFont,
+      fontSize = 12.sp,
+    ),
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(top = 4.dp)
+  )
+  BasicTextField(
+    value = TextFieldValue(
+      text = value,
+      selection = TextRange(value.length)
+    ),
+    onValueChange = { fieldValue ->
+      onValueChange(fieldValue.text)
+    },
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(top = 4.dp)
+      .heightIn(min = 32.dp)
+      .background(
+        color = colorResource(R.color.input_background_color),
+        shape = RoundedCornerShape(8.dp)
+      )
+      .padding(horizontal = 16.dp, vertical = 10.dp),
+    textStyle = TextStyle(
+      fontFamily = CustomFont.fzPoppinsFont,
+      fontSize = 12.sp,
+      color = Color.White
+    ),
+    cursorBrush = SolidColor(Color.White),
+    singleLine = true,
+    decorationBox = { innerTextField ->
+      Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.CenterStart,
+      ) {
+        if (value.isEmpty()) {
+          BasicText(
+            text = stringResource(R.string.birth_date_hint),
+            style = TextStyle(
+              color = Color.Gray,
+              fontSize = 12.sp,
+              fontFamily = CustomFont.fzPoppinsFont,
+            )
+          )
+        }
+        innerTextField()
+      }
+    }
   )
   if (!error.isNullOrBlank()) {
     BasicText(

@@ -69,8 +69,8 @@
   <string name="guardian_full_name_label">Họ và tên người giám hộ*</string>
   <string name="birth_date_label">Ngày sinh*</string>
   <string name="guardian_birth_date_label">Ngày sinh người giám hộ*</string>
-  <string name="gender_label">Giới tính*</string>
-  <string name="address_label">Địa chỉ*</string>
+  <string name="gender_label">Giới tính</string>
+  <string name="address_label">Địa chỉ</string>
   <string name="guardian_phone_label">Số điện thoại người giám hộ*</string>
   <string name="full_name_hint">Ví dụ: Nguyễn Văn A</string>
   <string name="birth_date_hint">DD/MM/YYYY</string>
