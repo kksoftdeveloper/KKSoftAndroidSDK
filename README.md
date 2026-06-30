@@ -2,43 +2,28 @@
 
 ## 1. Add SDK To Unity
 
-Enable these Unity Android settings:
+1. Add JitPack to `settings.gradle`:
 
-1. `Player Settings > Publishing Settings > Custom Main Gradle Template`
-2. `Player Settings > Publishing Settings > Custom Gradle Properties Template`
+   ```gradle
+   dependencyResolutionManagement {
+       repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+       repositories {
+           google()
+           mavenCentral()
+           maven { url "https://jitpack.io" }
+       }
+   }
+   ```
 
-Copy the SDK AAR into the Unity Android plugin folder:
+2. Add the KKSoft SDK dependency to the Android library/app module:
 
-```text
-Assets/Plugins/Android/kksoftsdk-release.aar
-```
+   ```gradle
+   implementation("com.github.kksoftdeveloper:KKSoftAndroidSDK:b804d5d")
+   ```
 
-If you are checking an exported Android project, copy it to:
-
-```text
-unityLibrary/libs/kksoftsdk-release.aar
-```
-
-Add repositories and dependencies to `mainTemplate.gradle`:
-
-```gradle
-repositories {
-    google()
-    mavenCentral()
-    maven { url "https://jitpack.io" }
-    mavenLocal()
-}
-
-dependencies {
-    implementation files("libs/kksoftsdk-release.aar")
-
-    implementation "com.appmb.sdk:mbcore:1.0.0"
-    implementation "com.appmb.sdk:mbcoreui:1.0.0"
-    implementation "com.appmb.sdk:mbauth:1.0.0"
-    implementation "com.appmb.sdk:mbpayment:1.0.0"
-    implementation "com.appmb.sdk:mbtracking:1.0.0"
-}
-```
+   Use `api(...)` instead of `implementation(...)` when another module, such as
+   `:launcher`, needs to compile directly against SDK classes exposed through a
+   library module.
 
 Add to `gradleTemplate.properties`:
 
@@ -47,13 +32,42 @@ android.useAndroidX=true
 android.enableJetifier=true
 ```
 
-## 2. Create Android Bridge
+## 2. Environment Configuration
+
+Host apps do not need to add `BuildConfig.ENVIRONMENT`, `BuildConfig.IS_STAGING`,
+or SDK base URL fields. These values are generated inside the KKSoft SDK.
+
+By default, the SDK uses production:
+
+```text
+BuildConfig.ENVIRONMENT = ""
+BuildConfig.IS_STAGING = false
+BuildConfig.IS_PRODUCTION = true
+```
+
+For SDK development only, set the environment before building the SDK:
+
+```properties
+# local.properties
+environment=staging
+```
+
+or:
+
+```bash
+./gradlew assembleDebug -PENVIRONMENT=staging
+```
+
+If `environment` / `ENVIRONMENT` is missing, empty, or not `staging`, the SDK falls
+back to production. The old `staging=true` local property is no longer used.
+
+## 3. Create Android Bridge
 
 Create a Kotlin or Java bridge in the Unity Android plugin source. Unity should call this bridge instead of calling every SDK class directly.
 
-The SDK uses production.
-
-`baseUrl` is optional. Only pass it when you need another environment. Unity only provides third-party tracking IDs and tokens through `TrackingConfig`.
+`baseUrl` is optional. Host apps should leave it empty unless they intentionally
+need to override the SDK endpoint at runtime. Unity only provides third-party
+tracking IDs and tokens through `TrackingConfig`.
 
 ```kotlin
 package com.company.game
@@ -275,7 +289,7 @@ class MainActivity : com.unity3d.player.UnityPlayerActivity() {
 }
 ```
 
-## 3. Call From Unity C#
+## 4. Call From Unity C#
 
 Attach this script to a GameObject named `KKSoftAndroid`, because the Android bridge sends callbacks to that object.
 
@@ -387,7 +401,7 @@ public class KKSoftAndroid : MonoBehaviour
 }
 ```
 
-## 4. Auth Flow
+## 5. Auth Flow
 
 Use this order:
 
@@ -410,7 +424,7 @@ failure:<status>:<message>
 cancelled
 ```
 
-## 5. Payment Flow
+## 6. Payment Flow
 
 Use this order:
 
@@ -431,7 +445,7 @@ unavailable_in_server
 not_authenticated
 ```
 
-## 6. Tracking Flow
+## 7. Tracking Flow
 
 Tracking is initialized by `Initialize()` through `TrackingConfig`.
 

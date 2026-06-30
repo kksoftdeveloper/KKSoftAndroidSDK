@@ -18,12 +18,15 @@ internal fun Project.configureEnvironment(
     }
 
     val configuredBaseUrl = localProperties["base.url"]?.toString()?.trim().orEmpty()
+    val configuredEnvironment = (
+        findProperty("ENVIRONMENT")?.toString()
+            ?: findProperty("environment")?.toString()
+            ?: localProperties.getProperty("environment")
+            ?: ""
+        ).trim()
 
     // Environment detection
-    val isStaging = localProperties
-        .getProperty("staging")
-        ?.equals("true", ignoreCase = true)
-        ?: false
+    val isStaging = configuredEnvironment.equals("staging", ignoreCase = true)
     val isProduction = !isStaging
 
     // Environment URLs
@@ -35,6 +38,7 @@ internal fun Project.configureEnvironment(
         buildTypes.forEach {
             it.buildConfigField("Boolean", "IS_PRODUCTION", isProduction.toString())
             it.buildConfigField("Boolean", "IS_STAGING", isStaging.toString())
+            it.buildConfigField("String", "ENVIRONMENT", "\"$configuredEnvironment\"")
             it.buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
             it.buildConfigField("String", "AUTH_BASE_URL", "\"$baseUrl\"")
             it.buildConfigField("String", "PAYMENT_BASE_URL", "\"$baseUrl\"")
