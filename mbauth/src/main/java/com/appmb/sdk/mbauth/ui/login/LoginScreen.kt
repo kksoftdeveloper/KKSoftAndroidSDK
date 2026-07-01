@@ -175,6 +175,27 @@ fun LoginScreen(
     )
 
     Spacer(modifier = Modifier.height(4.dp))
+    // Forgot password
+    BasicText(
+      text = stringResource(R.string.forgot_password),
+      style = TextStyle(
+        textDecoration = TextDecoration.Underline,
+        fontWeight = FontWeight(700),
+        fontFamily = CustomFont.fzPoppinsFont,
+        fontSize = 10.sp,
+        color = colorResource(R.color.blue_text_link_color),
+        textAlign = TextAlign.Center
+      ),
+      modifier = Modifier
+        .padding(vertical = 2.dp)
+        .background(Color.Transparent)
+        .clickable {
+          // Handle forgot password flow
+          navigateToRequestOtp.invoke(MbAuthParams.OTP_TYPE_PARAM_FORGOT_PASSWORD)
+        }
+        .padding(vertical = 2.dp)
+        .align(Alignment.CenterHorizontally)
+    )
     
     // Terms and conditions
     Row(
@@ -225,7 +246,7 @@ fun LoginScreen(
     Spacer(modifier = Modifier.height(4.dp))
     // Social Buttons
     Row(
-      horizontalArrangement = Arrangement.spacedBy(12.dp),
+      horizontalArrangement = Arrangement.spacedBy(6.dp),
       modifier = Modifier
         .fillMaxWidth()
         .padding(horizontal = 16.dp),
@@ -233,6 +254,7 @@ fun LoginScreen(
       // Google button
       if (uiState.isGoogleEnabled) {
         SocialButtonView(
+          text = stringResource(R.string.google),
           iconResId = R.drawable.ic_google,
           onClick = {
             if (!uiState.isLoading) {
@@ -248,6 +270,7 @@ fun LoginScreen(
 //      // Facebook button
       if (uiState.isFacebookEnabled) {
         SocialButtonView(
+          text = stringResource(R.string.facebook),
           iconResId = R.drawable.ic_facebook,
           onClick = {
             if (!uiState.isLoading) {
@@ -263,6 +286,17 @@ fun LoginScreen(
     Row(
 
     ) {
+      BasicText(
+        text = stringResource(R.string.dont_have_account),
+        style = TextStyle(
+          fontFamily = CustomFont.fzPoppinsFont,
+          fontSize = 10.sp,
+          color = colorResource(R.color.dark_gray_title),
+          textAlign = TextAlign.Center
+        ),
+        modifier = Modifier
+          .padding(vertical = 8.dp)
+      )
 
       BasicText(
         text = stringResource(R.string.sign_up_now),
@@ -275,30 +309,10 @@ fun LoginScreen(
           textAlign = TextAlign.Center
         ),
         modifier = Modifier
-          .padding(vertical = 8.dp)
+          .padding(vertical = 8.dp, horizontal = 4.dp)
           .background(Color.Transparent)
           .clickable {
             navigateToRequestOtp.invoke(MbAuthParams.OTP_TYPE_PARAM_REGISTRATION)
-          }
-      )
-
-      // Forgot password
-      BasicText(
-        text = stringResource(R.string.forgot_password),
-        style = TextStyle(
-          textDecoration = TextDecoration.Underline,
-          fontWeight = FontWeight(700),
-          fontFamily = CustomFont.fzPoppinsFont,
-          fontSize = 10.sp,
-          color = colorResource(R.color.blue_text_link_color),
-          textAlign = TextAlign.Center
-        ),
-        modifier = Modifier
-          .padding(vertical = 8.dp, horizontal = 24.dp)
-          .background(Color.Transparent)
-          .clickable {
-            // Handle forgot password flow
-            navigateToRequestOtp.invoke(MbAuthParams.OTP_TYPE_PARAM_FORGOT_PASSWORD)
           }
       )
     }

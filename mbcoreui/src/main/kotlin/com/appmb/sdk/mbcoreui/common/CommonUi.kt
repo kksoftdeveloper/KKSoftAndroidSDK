@@ -194,7 +194,7 @@ fun SocialButtonView(
     Image(
       painter = painterResource(iconResId),
       contentDescription = null,
-      modifier = Modifier.size(14.dp)
+      modifier = Modifier.size(12.dp)
     )
     text?.let {
       BasicText(
