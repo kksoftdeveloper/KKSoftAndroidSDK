@@ -102,6 +102,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+import java.util.Calendar
 
 class AuthActivity : ComponentActivity() {
 
@@ -403,8 +404,6 @@ fun AppNavigator(
   var registrationPersonalInfo by remember { mutableStateOf<RegistrationInfo?>(null) }
   var registrationGuardianInfo by remember { mutableStateOf<GuardianRegistrationInfo?>(null) }
   var registrationGuardianOtpToken by remember { mutableStateOf<String?>(null) }
-  // TODO: Map this from login profile fields when backend returns required profile status.
-  val profileRequirement = remember { LoginProfileRequirement.MissingBirthDate }
 
   fun clearRegistrationProfileState() {
     registrationPlayerOtpToken = null
@@ -439,6 +438,14 @@ fun AppNavigator(
       LoginProfileRequirement.Under16 -> {
         navController.navigate(route = "CompleteProfilePersonalInfo/true/false")
       }
+    }
+  }
+
+  fun resolveLoginProfileRequirement(result: AuthResult.AuthSuccess): LoginProfileRequirement {
+    return if (result.user.identityVerificationRequired == true) {
+      LoginProfileRequirement.MissingBirthDate
+    } else {
+      LoginProfileRequirement.Complete
     }
   }
 
@@ -481,7 +488,7 @@ fun AppNavigator(
         },
         onAuthSuccess = { result ->
           pendingAuthSuccess = result
-          openProfileCompletionFlow(profileRequirement)
+          openProfileCompletionFlow(resolveLoginProfileRequirement(result))
         },
         handleGoogleSignIn = handleGoogleSignIn
       )
@@ -748,8 +755,9 @@ fun AppNavigator(
           isUnder16 = isUnder16,
           requiresUserPhoneVerification = requiresUserPhoneVerification
         ),
-        onContinue = { _ ->
-          if (isUnder16) {
+        onContinue = { personalInfo ->
+          val resolvedIsUnder16 = personalInfo.dateOfBirth.isUnder16BirthDate() ?: isUnder16
+          if (resolvedIsUnder16) {
             navController.navigate(route = "CompleteProfileGuardianInfo/$requiresUserPhoneVerification")
           } else {
             completePendingLogin()
@@ -1004,6 +1012,23 @@ private fun MissingRequiredProfileDialog(
       }
     },
   )
+}
+
+private fun String.isUnder16BirthDate(): Boolean? {
+  val parts = split("-")
+  if (parts.size != 3) return null
+  val year = parts[0].toIntOrNull() ?: return null
+  val month = parts[1].toIntOrNull() ?: return null
+  val day = parts[2].toIntOrNull() ?: return null
+  if (month !in 1..12 || day !in 1..31) return null
+
+  val sixteenthBirthday = Calendar.getInstance().apply {
+    isLenient = false
+    set(year, month - 1, day)
+    add(Calendar.YEAR, 16)
+  }
+
+  return sixteenthBirthday.after(Calendar.getInstance())
 }
 
 private enum class LoginProfileRequirement {

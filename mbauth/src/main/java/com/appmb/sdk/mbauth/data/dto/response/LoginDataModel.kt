@@ -16,7 +16,8 @@ data class LoginDataModel(
   val serverId: String? = null,
   val userBlocked: Boolean? = false,
   val gameBlocked: Boolean? = false,
-  val serverBlocked: Boolean? = false
+  val serverBlocked: Boolean? = false,
+  val identityVerificationRequired: Boolean? = false
 ) {
   fun toEntity(): MbAuthData {
     return MbAuthData(
@@ -30,7 +31,8 @@ data class LoginDataModel(
       serverId = serverId,
       userBlocked = userBlocked,
       gameBlocked = gameBlocked,
-      serverBlocked = serverBlocked
+      serverBlocked = serverBlocked,
+      identityVerificationRequired = identityVerificationRequired
     )
   }
 }

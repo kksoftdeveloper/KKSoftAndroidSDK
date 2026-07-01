@@ -20,6 +20,7 @@ data class MbAuthData(
   val userBlocked: Boolean? = false,
   val gameBlocked: Boolean? = false,
   val serverBlocked: Boolean? = false,
+  val identityVerificationRequired: Boolean? = false,
 ) : Parcelable
 
 fun MbAuthData?.isNullOrEmpty(): Boolean {
