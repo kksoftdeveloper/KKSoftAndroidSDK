@@ -55,6 +55,7 @@ import com.appmb.sdk.mbauth.model.RegistrationInfo
 import com.appmb.sdk.mbauth.model.RegistrationProfile
 import com.appmb.sdk.mbauth.model.SdkParams
 import com.appmb.sdk.mbauth.ui.deactivate.DeactivateAccountView
+import com.appmb.sdk.mbauth.ui.components.AgeConfirmationTermsText
 import com.appmb.sdk.mbauth.ui.forceupdate.RemindUpdateView
 import com.appmb.sdk.mbauth.ui.linkaccount.LinkAccountScreen
 import com.appmb.sdk.mbauth.ui.login.AuthResult
@@ -990,7 +991,7 @@ private fun MissingRequiredProfileDialog(
           modifier = Modifier.size(16.dp)
         )
         Spacer(modifier = Modifier.width(8.dp))
-        Text(text = stringResource(R.string.confirm_age_16_or_older))
+        AgeConfirmationTermsText(modifier = Modifier.weight(1f))
       }
     },
     confirmButton = {

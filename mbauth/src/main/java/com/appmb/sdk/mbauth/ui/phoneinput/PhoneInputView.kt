@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.appmb.sdk.mbauth.model.MbAuthParams
+import com.appmb.sdk.mbauth.ui.components.AgeConfirmationTermsText
 import com.appmb.sdk.mbauth.ui.components.TermsAndConditionsText
 import com.appmb.sdk.mbauth.ui.frame.MbAuthFrameContainer
 import com.appmb.sdk.mbcoreui.R
@@ -171,15 +172,7 @@ fun PhoneInputView(
         Spacer(
           modifier = Modifier.width(width = 4.dp)
         )
-        BasicText(
-          text = stringResource(R.string.confirm_age_16_or_older),
-          style = TextStyle(
-            color = colorResource(R.color.black),
-            fontFamily = CustomFont.fzPoppinsFont,
-            fontSize = 10.sp,
-          ),
-          modifier = Modifier.weight(1f)
-        )
+        AgeConfirmationTermsText(modifier = Modifier.weight(1f))
       }
     }
     BasicText(

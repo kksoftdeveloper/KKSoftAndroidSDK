@@ -81,7 +81,7 @@ fun LinkAccountScreen(
     )
     // Social Buttons
     Row(
-      horizontalArrangement = Arrangement.spacedBy(4.dp),
+      horizontalArrangement = Arrangement.spacedBy(12.dp),
       modifier = Modifier
         .fillMaxWidth()
         .padding(top = 16.dp)

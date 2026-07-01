@@ -84,6 +84,47 @@ fun TermsAndConditionsText() {
   )
 }
 
+@Composable
+fun AgeConfirmationTermsText(
+  modifier: Modifier = Modifier
+) {
+  val context = LocalContext.current
+  val linkText = "Điều khoản sử dụng"
+  val termsUrl = "https://docs.google.com/document/d/14-sD0kAL9XRNSTjuFu3Oa86xSJw-TSB-z0QaGy7e6OM/edit?tab=t.0"
+
+  val annotatedString = buildAnnotatedString {
+    append("Tôi xác nhận mình đủ 16 tuổi trở lên và chấp nhận với ")
+
+    pushStringAnnotation(tag = "AGE_TERMS", annotation = termsUrl)
+    withStyle(
+      style = SpanStyle(
+        color = colorResource(R.color.blue_text_link_color),
+        textDecoration = TextDecoration.Underline
+      )
+    ) {
+      append(linkText)
+    }
+    pop()
+  }
+
+  ClickableText(
+    text = annotatedString,
+    modifier = modifier,
+    style = TextStyle(
+      fontFamily = CustomFont.fzPoppinsFont,
+      fontSize = TextUnit(10f, TextUnitType.Sp),
+      textAlign = TextAlign.Left,
+      color = colorResource(R.color.dark_gray_title)
+    ),
+    onClick = { offset ->
+      annotatedString.getStringAnnotations("AGE_TERMS", start = offset, end = offset)
+        .firstOrNull()?.let {
+          context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(termsUrl)))
+        }
+    }
+  )
+}
+
 
 @Preview
 @Composable

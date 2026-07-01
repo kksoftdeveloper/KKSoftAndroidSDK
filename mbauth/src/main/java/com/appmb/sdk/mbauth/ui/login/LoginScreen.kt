@@ -245,7 +245,7 @@ fun LoginScreen(
     Spacer(modifier = Modifier.height(4.dp))
     // Social Buttons
     Row(
-      horizontalArrangement = Arrangement.spacedBy(4.dp),
+      horizontalArrangement = Arrangement.spacedBy(12.dp),
       modifier = Modifier
         .fillMaxWidth()
         .padding(horizontal = 16.dp),
