@@ -1,7 +1,5 @@
 package com.appmb.sdk.mbauth.ui.login
 
-import android.app.Activity
-import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -56,6 +54,7 @@ fun LoginScreen(
   gameId: Int,
   navigateToChooseServer: () -> Unit,
   navigateToRequestOtp: (String) -> Unit = {},
+  onAuthSuccess: (AuthResult.AuthSuccess) -> Unit = {},
   handleGoogleSignIn: ((GoogleSignInAccount) -> Unit) -> Unit,
 ) {
   val authViewModel: AuthViewModel = koinViewModel(parameters = { parametersOf(gameId) })
@@ -67,7 +66,6 @@ fun LoginScreen(
   val uiState by authViewModel.uiState.collectAsState()
   val authResultState = authViewModel.authResult.collectAsState()
   val loginState = authViewModel.loginState.collectAsState()
-  val activity = LocalContext.current as? Activity
   val context = LocalContext.current
 
 //  val toastHostState = remember { ToastHostState() }
@@ -90,23 +88,15 @@ fun LoginScreen(
 
   LaunchedEffect(authResultState.value) {
     authResultState.value?.let { result ->
-      val intent = Intent().apply {
-        putExtra("authResult", result)
-      }
-
       when (result) {
         is AuthResult.AuthSuccess -> {
-          val authResult: AuthResult? = intent.getParcelableExtra<AuthResult?>("authResult")
-          if (authResult is AuthResult.AuthSuccess) {
-            authResult.user.userBlocked?.let { isBlocked ->
-              if (isBlocked) {
-                val resultIntent = Intent(MbAuth.ACTION_USER_BLOCKED)
-                LocalBroadcastManager.getInstance(context).sendBroadcast(resultIntent)
-              }
+          result.user.userBlocked?.let { isBlocked ->
+            if (isBlocked) {
+              val resultIntent = android.content.Intent(MbAuth.ACTION_USER_BLOCKED)
+              LocalBroadcastManager.getInstance(context).sendBroadcast(resultIntent)
             }
-            activity?.setResult(Activity.RESULT_OK, intent)
-            activity?.finish()
           }
+          onAuthSuccess(result)
         }
 
         is AuthResult.Failure -> {
@@ -288,17 +278,6 @@ fun LoginScreen(
         )
       }
 
-      // Play now
-      SocialButtonView(
-        text = stringResource(R.string.play_as_guest),
-        iconResId = R.drawable.ic_play_now,
-        onClick = {
-          if (!uiState.isLoading) {
-            authViewModel.dispatch(AuthIntent.LoginByGuest)
-          }
-        },
-        modifier = Modifier.weight(1f)
-      )
     }
 
     Row(

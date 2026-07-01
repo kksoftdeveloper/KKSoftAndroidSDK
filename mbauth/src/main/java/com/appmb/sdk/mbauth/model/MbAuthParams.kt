@@ -35,6 +35,8 @@ class MbAuthParams {
   // Google SignIn Account
   internal var googleAccount: GoogleSignInAccount? = null
 
+  internal var registrationProfile: RegistrationProfile? = null
+
   private constructor()
 
   /**
@@ -60,6 +62,7 @@ class MbAuthParams {
     private var linkAccountType: LinkAccountType? = null,
     // Google signIn account
     private var googleAccount: GoogleSignInAccount? = null,
+    private var registrationProfile: RegistrationProfile? = null,
   ) {
 
     private constructor(builder: Builder) : this(
@@ -76,7 +79,8 @@ class MbAuthParams {
       otp = builder.otp,
       otpType = builder.otpType,
       linkAccountType = builder.linkAccountType,
-      googleAccount = builder.googleAccount
+      googleAccount = builder.googleAccount,
+      registrationProfile = builder.registrationProfile
     )
 
     /**
@@ -210,6 +214,7 @@ class MbAuthParams {
       otpType = this@Builder.otpType
       linkAccountType = this@Builder.linkAccountType
       googleAccount = this@Builder.googleAccount
+      registrationProfile = this@Builder.registrationProfile
     }
   }
 
@@ -345,11 +350,13 @@ class MbAuthParams {
      */
     fun buildRegister(
       phone: String?,
-      password: String
+      password: String,
+      registrationProfile: RegistrationProfile? = null,
     ) = Builder(
       type = LoginType.PHONE,
       phone = phone,
       password = password,
+      registrationProfile = registrationProfile,
     ).build()
 
     /**
@@ -405,4 +412,3 @@ enum class LinkAccountType {
   GOOGLE,
   FACEBOOK
 }
-

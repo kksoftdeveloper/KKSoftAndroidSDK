@@ -13,8 +13,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +34,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -38,7 +48,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.appmb.sdk.mbauth.event.LoginAnalytics
+import com.appmb.sdk.mbauth.model.GuardianRegistrationInfo
 import com.appmb.sdk.mbauth.model.MbAuthParams
+import com.appmb.sdk.mbauth.model.RegistrationConsent
+import com.appmb.sdk.mbauth.model.RegistrationInfo
+import com.appmb.sdk.mbauth.model.RegistrationProfile
 import com.appmb.sdk.mbauth.model.SdkParams
 import com.appmb.sdk.mbauth.ui.deactivate.DeactivateAccountView
 import com.appmb.sdk.mbauth.ui.forceupdate.RemindUpdateView
@@ -56,6 +70,7 @@ import com.appmb.sdk.mbauth.ui.passwordinput.SignUpPasswordInputScreen
 import com.appmb.sdk.mbauth.ui.phoneinput.PhoneInputView
 import com.appmb.sdk.mbauth.ui.registration.GuardianInfoScreen
 import com.appmb.sdk.mbauth.ui.registration.PersonalInfoScreen
+import com.appmb.sdk.mbauth.ui.registration.ProfileCompletionStep
 import com.appmb.sdk.mbauth.ui.registration.RegistrationFlow
 import com.appmb.sdk.mbauth.ui.registration.RegistrationStep
 import com.appmb.sdk.mbauth.ui.server.ServerListScreen
@@ -71,6 +86,8 @@ import com.appmb.sdk.mbcore.domain.MbInitialize
 import com.appmb.sdk.mbcore.event.AnalyticsProvider
 import kotlinx.coroutines.launch
 import com.appmb.sdk.mbcore.utils.ConnectivityViewModel
+import com.appmb.sdk.mbcoreui.R
+import com.appmb.sdk.mbcoreui.common.CustomCheckbox
 import com.appmb.sdk.mbcoreui.theme.AppMbSampleTheme
 import com.appmb.sdk.mbcoreui.utils.OfflineBanner
 import com.facebook.FacebookSdk
@@ -379,6 +396,51 @@ fun AppNavigator(
   handleGoogleSignIn: ((GoogleSignInAccount) -> Unit) -> Unit,
   handleGoogleSignOut: () -> Unit,
 ) {
+  var pendingAuthSuccess by remember { mutableStateOf<AuthResult.AuthSuccess?>(null) }
+  var showMissingBirthDateDialog by remember { mutableStateOf(false) }
+  var registrationPlayerOtpToken by remember { mutableStateOf<String?>(null) }
+  var registrationPersonalInfo by remember { mutableStateOf<RegistrationInfo?>(null) }
+  var registrationGuardianInfo by remember { mutableStateOf<GuardianRegistrationInfo?>(null) }
+  var registrationGuardianOtpToken by remember { mutableStateOf<String?>(null) }
+  // TODO: Map this from login profile fields when backend returns required profile status.
+  val profileRequirement = remember { LoginProfileRequirement.MissingBirthDate }
+
+  fun clearRegistrationProfileState() {
+    registrationPlayerOtpToken = null
+    registrationPersonalInfo = null
+    registrationGuardianInfo = null
+    registrationGuardianOtpToken = null
+  }
+
+  fun completePendingLogin() {
+    val result = pendingAuthSuccess ?: return
+    val intent = Intent().apply {
+      putExtra("authResult", result)
+    }
+    (navController.context as? ComponentActivity)?.setResult(Activity.RESULT_OK, intent)
+    (navController.context as? ComponentActivity)?.finish()
+  }
+
+  fun cancelPendingProfileCompletion() {
+    pendingAuthSuccess = null
+    showMissingBirthDateDialog = false
+    navController.popBackStack(route = Authenticate.name, inclusive = false)
+  }
+
+  fun openProfileCompletionFlow(requirement: LoginProfileRequirement) {
+    when (requirement) {
+      LoginProfileRequirement.Complete -> completePendingLogin()
+      LoginProfileRequirement.MissingBirthDate -> showMissingBirthDateDialog = true
+      LoginProfileRequirement.Adult -> {
+        navController.navigate(route = "CompleteProfilePersonalInfo/false/false")
+      }
+
+      LoginProfileRequirement.Under16 -> {
+        navController.navigate(route = "CompleteProfilePersonalInfo/true/false")
+      }
+    }
+  }
+
   NavHost(
     navController, startDestination =
       when (params) {
@@ -416,6 +478,10 @@ fun AppNavigator(
           val route = RequestOTP(otpType).getNavPath()
           navController.navigate(route)
         },
+        onAuthSuccess = { result ->
+          pendingAuthSuccess = result
+          openProfileCompletionFlow(profileRequirement)
+        },
         handleGoogleSignIn = handleGoogleSignIn
       )
     }
@@ -426,6 +492,11 @@ fun AppNavigator(
       )
     ) {
       val otpType = it.arguments?.getString("otpType").orEmpty()
+      LaunchedEffect(otpType) {
+        if (otpType == MbAuthParams.OTP_TYPE_PARAM_REGISTRATION) {
+          clearRegistrationProfileState()
+        }
+      }
       PhoneInputView(
         otpType = otpType,
         stepLabel = if (otpType == MbAuthParams.OTP_TYPE_PARAM_REGISTRATION) {
@@ -438,7 +509,7 @@ fun AppNavigator(
         },
         onClose = {
           if (otpType == MbAuthParams.OTP_TYPE_PARAM_REGISTRATION) {
-            (navController.context as? ComponentActivity)?.finish()
+            navController.closeRegistrationFlow()
           } else {
             navController.popBackStack()
           }
@@ -467,9 +538,10 @@ fun AppNavigator(
         } else {
           null
         },
-        onOtpVerifiedSuccess = {
+        onOtpVerifiedSuccess = { verifiedOtpData ->
           when (otpType) {
             MbAuthParams.OTP_TYPE_PARAM_REGISTRATION -> {
+              registrationPlayerOtpToken = verifiedOtpData.otpVerifiedToken
               navController.navigate(route = "RegisterPersonalInfo/$phoneNumber/$isUnder16")
             }
 
@@ -488,7 +560,7 @@ fun AppNavigator(
         },
         onClose = {
           if (otpType == MbAuthParams.OTP_TYPE_PARAM_REGISTRATION) {
-            (navController.context as? ComponentActivity)?.finish()
+            navController.closeRegistrationFlow()
           } else {
             navController.popBackStack()
           }
@@ -507,7 +579,8 @@ fun AppNavigator(
       val isUnder16 = it.arguments?.getBoolean("isUnder16") ?: false
       PersonalInfoScreen(
         stepLabel = RegistrationFlow.label(RegistrationStep.PersonalInfo, isUnder16),
-        onContinue = {
+        onContinue = { personalInfo ->
+          registrationPersonalInfo = personalInfo
           if (isUnder16) {
             navController.navigate(route = "RegisterGuardianInfo/$phoneNumber")
           } else {
@@ -515,7 +588,7 @@ fun AppNavigator(
           }
         },
         onClose = {
-          (navController.context as? ComponentActivity)?.finish()
+          navController.closeRegistrationFlow()
         }
       )
     }
@@ -529,11 +602,12 @@ fun AppNavigator(
       val phoneNumber = it.arguments?.getString("phone").orEmpty()
       GuardianInfoScreen(
         stepLabel = RegistrationFlow.label(RegistrationStep.GuardianInfo, isUnder16 = true),
-        onContinue = { guardianPhone, timeToRetry ->
-          navController.navigate(route = "RegisterGuardianOTP/$phoneNumber/$guardianPhone/$timeToRetry")
+        onContinue = { guardianInfo, timeToRetry ->
+          registrationGuardianInfo = guardianInfo
+          navController.navigate(route = "RegisterGuardianOTP/$phoneNumber/${guardianInfo.phone}/$timeToRetry")
         },
         onClose = {
-          (navController.context as? ComponentActivity)?.finish()
+          navController.closeRegistrationFlow()
         }
       )
     }
@@ -554,11 +628,12 @@ fun AppNavigator(
         phoneNumber = guardianPhone,
         timeToRetry = timeToRetry,
         stepLabel = RegistrationFlow.label(RegistrationStep.GuardianOtp, isUnder16 = true),
-        onOtpVerifiedSuccess = {
+        onOtpVerifiedSuccess = { verifiedOtpData ->
+          registrationGuardianOtpToken = verifiedOtpData.otpVerifiedToken
           navController.navigate(route = "Register/$phoneNumber/true")
         },
         onClose = {
-          (navController.context as? ComponentActivity)?.finish()
+          navController.closeRegistrationFlow()
         }
       )
     }
@@ -572,18 +647,172 @@ fun AppNavigator(
     ) {
       val phoneNumber = it.arguments?.getString("phone").orEmpty()
       val isUnder16 = it.arguments?.getBoolean("isUnder16") ?: false
+      val registrationProfile = registrationPersonalInfo?.let { personalInfo ->
+        RegistrationProfile(
+          playerOtpVerifiedToken = registrationPlayerOtpToken,
+          personalInfo = personalInfo,
+          consent = RegistrationConsent(
+            legalAccepted = true,
+            selfRegistrationAgeConfirmed = !isUnder16,
+          ),
+          guardian = if (isUnder16) {
+            registrationGuardianInfo?.copy(otpVerifiedToken = registrationGuardianOtpToken)
+          } else {
+            null
+          }
+        )
+      }
       SignUpPasswordInputScreen(
         activity = navController.context as ComponentActivity,
         authViewModel = koinViewModel<AuthViewModel>(parameters = { parametersOf(gameId) }),
         phoneNumber = phoneNumber,
+        registrationProfile = registrationProfile,
         stepLabel = RegistrationFlow.label(RegistrationStep.Password, isUnder16),
         navigateToChooseServer = {
           navController.navigateWithoutBackStack(ChooseServer)
         },
         onClose = {
-          (navController.context as? ComponentActivity)?.finish()
+          navController.closeRegistrationFlow()
         }
       ).Content()
+    }
+
+    composable(
+      route = CompleteProfilePhone.NAME,
+      arguments = listOf(
+        navArgument("isUnder16") { type = NavType.BoolType }
+      )
+    ) {
+      val isUnder16 = it.arguments?.getBoolean("isUnder16") ?: false
+      PhoneInputView(
+        otpType = MbAuthParams.OTP_TYPE_PARAM_REGISTRATION,
+        stepLabel = RegistrationFlow.profileCompletionLabel(
+          ProfileCompletionStep.Phone,
+          isUnder16 = isUnder16,
+          requiresUserPhoneVerification = true
+        ),
+        showAgeConfirmation = false,
+        forcedIsUnder16 = isUnder16,
+        navigateToVerifyOtp = { phone, timeToRetry, _ ->
+          navController.navigate(route = "CompleteProfileVerifyOTP/$phone/$timeToRetry/$isUnder16")
+        },
+        onClose = {
+          cancelPendingProfileCompletion()
+        }
+      )
+    }
+
+    composable(
+      route = CompleteProfileVerifyOTP.NAME,
+      arguments = listOf(
+        navArgument("phone") { type = NavType.StringType },
+        navArgument("timeToRetry") { type = NavType.IntType },
+        navArgument("isUnder16") { type = NavType.BoolType }
+      )
+    ) {
+      val phoneNumber = it.arguments?.getString("phone").orEmpty()
+      val timeToRetry = it.arguments?.getInt("timeToRetry") ?: 0
+      val isUnder16 = it.arguments?.getBoolean("isUnder16") ?: false
+      OtpInputScreen(
+        otpType = MbAuthParams.OTP_TYPE_PARAM_REGISTRATION,
+        phoneNumber = phoneNumber,
+        timeToRetry = timeToRetry,
+        stepLabel = RegistrationFlow.profileCompletionLabel(
+          ProfileCompletionStep.UserOtp,
+          isUnder16 = isUnder16,
+          requiresUserPhoneVerification = true
+        ),
+        onOtpVerifiedSuccess = { _ ->
+          navController.navigate(route = "CompleteProfilePersonalInfo/$isUnder16/true")
+        },
+        onClose = {
+          cancelPendingProfileCompletion()
+        }
+      )
+    }
+
+    composable(
+      route = CompleteProfilePersonalInfo.NAME,
+      arguments = listOf(
+        navArgument("isUnder16") { type = NavType.BoolType },
+        navArgument("requiresUserPhoneVerification") { type = NavType.BoolType }
+      )
+    ) {
+      val isUnder16 = it.arguments?.getBoolean("isUnder16") ?: false
+      val requiresUserPhoneVerification =
+        it.arguments?.getBoolean("requiresUserPhoneVerification") ?: false
+      PersonalInfoScreen(
+        stepLabel = RegistrationFlow.profileCompletionLabel(
+          ProfileCompletionStep.PersonalInfo,
+          isUnder16 = isUnder16,
+          requiresUserPhoneVerification = requiresUserPhoneVerification
+        ),
+        onContinue = { _ ->
+          if (isUnder16) {
+            navController.navigate(route = "CompleteProfileGuardianInfo/$requiresUserPhoneVerification")
+          } else {
+            completePendingLogin()
+          }
+        },
+        onClose = {
+          cancelPendingProfileCompletion()
+        }
+      )
+    }
+
+    composable(
+      route = CompleteProfileGuardianInfo.NAME,
+      arguments = listOf(
+        navArgument("requiresUserPhoneVerification") { type = NavType.BoolType }
+      )
+    ) {
+      val requiresUserPhoneVerification =
+        it.arguments?.getBoolean("requiresUserPhoneVerification") ?: false
+      GuardianInfoScreen(
+        stepLabel = RegistrationFlow.profileCompletionLabel(
+          ProfileCompletionStep.GuardianInfo,
+          isUnder16 = true,
+          requiresUserPhoneVerification = requiresUserPhoneVerification
+        ),
+        onContinue = { guardianInfo, timeToRetry ->
+          navController.navigate(
+            route = "CompleteProfileGuardianOTP/${guardianInfo.phone}/$timeToRetry/$requiresUserPhoneVerification"
+          )
+        },
+        onClose = {
+          cancelPendingProfileCompletion()
+        }
+      )
+    }
+
+    composable(
+      route = CompleteProfileGuardianOTP.NAME,
+      arguments = listOf(
+        navArgument("guardianPhone") { type = NavType.StringType },
+        navArgument("timeToRetry") { type = NavType.IntType },
+        navArgument("requiresUserPhoneVerification") { type = NavType.BoolType }
+      )
+    ) {
+      val guardianPhone = it.arguments?.getString("guardianPhone").orEmpty()
+      val timeToRetry = it.arguments?.getInt("timeToRetry") ?: 0
+      val requiresUserPhoneVerification =
+        it.arguments?.getBoolean("requiresUserPhoneVerification") ?: false
+      OtpInputScreen(
+        otpType = MbAuthParams.OTP_TYPE_PARAM_REGISTRATION,
+        phoneNumber = guardianPhone,
+        timeToRetry = timeToRetry,
+        stepLabel = RegistrationFlow.profileCompletionLabel(
+          ProfileCompletionStep.GuardianOtp,
+          isUnder16 = true,
+          requiresUserPhoneVerification = requiresUserPhoneVerification
+        ),
+        onOtpVerifiedSuccess = { _ ->
+          completePendingLogin()
+        },
+        onClose = {
+          cancelPendingProfileCompletion()
+        }
+      )
     }
 //    composable(
 //      route = LinkAccount.name
@@ -727,11 +956,71 @@ fun AppNavigator(
       )
     }
   }
+
+  if (showMissingBirthDateDialog) {
+    MissingRequiredProfileDialog(
+      onContinue = { confirmedAge16OrOlder ->
+        showMissingBirthDateDialog = false
+        val isUnder16 = !confirmedAge16OrOlder
+        navController.navigate(route = "CompleteProfilePhone/$isUnder16")
+      }
+    )
+  }
+}
+
+@Composable
+private fun MissingRequiredProfileDialog(
+  onContinue: (confirmedAge16OrOlder: Boolean) -> Unit,
+) {
+  var confirmedAge16OrOlder by remember { mutableStateOf(true) }
+
+  AlertDialog(
+    onDismissRequest = {},
+    title = {
+      Text(text = stringResource(R.string.required_profile_update_title))
+    },
+    text = {
+      Row(
+        verticalAlignment = Alignment.Top,
+        modifier = Modifier.padding(top = 4.dp)
+      ) {
+        CustomCheckbox(
+          checked = confirmedAge16OrOlder,
+          onCheckedChange = { confirmedAge16OrOlder = it },
+          modifier = Modifier.size(16.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(text = stringResource(R.string.confirm_age_16_or_older))
+      }
+    },
+    confirmButton = {
+      Button(
+        onClick = {
+          onContinue(confirmedAge16OrOlder)
+        }
+      ) {
+        Text(text = stringResource(R.string.common_continue))
+      }
+    },
+  )
+}
+
+private enum class LoginProfileRequirement {
+  Complete,
+  MissingBirthDate,
+  Adult,
+  Under16,
 }
 
 internal fun <T : AuthScreen> NavHostController.navigateWithoutBackStack(route: T) {
   this.navigate(route = route.name) {
     popUpTo(0) { inclusive = true }
     launchSingleTop = true
+  }
+}
+
+private fun NavHostController.closeRegistrationFlow() {
+  if (!popBackStack(route = RequestOTP.NAME, inclusive = true)) {
+    popBackStack()
   }
 }

@@ -37,6 +37,8 @@ import org.koin.androidx.compose.koinViewModel
 fun PhoneInputView(
   otpType: String,
   stepLabel: String? = null,
+  showAgeConfirmation: Boolean = otpType == MbAuthParams.OTP_TYPE_PARAM_REGISTRATION,
+  forcedIsUnder16: Boolean? = null,
   navigateToVerifyOtp: (String, Int, Boolean) -> Unit,
   onClose: () -> Unit
 ) {
@@ -47,8 +49,9 @@ fun PhoneInputView(
 
   var phoneNumber by rememberSaveable { mutableStateOf("") }
   var acceptTerms by rememberSaveable { mutableStateOf(false) }
-  var confirmedAge16OrOlder by rememberSaveable { mutableStateOf(false) }
+  var confirmedAge16OrOlder by rememberSaveable { mutableStateOf(true) }
   val isRegistration = otpType == MbAuthParams.OTP_TYPE_PARAM_REGISTRATION
+  val shouldShowAgeConfirmation = isRegistration && showAgeConfirmation
 
   // Display api request error
   var apiError by rememberSaveable { mutableStateOf("") }
@@ -68,7 +71,7 @@ fun PhoneInputView(
       navigateToVerifyOtp(
         state.phone,
         state.timeToRetry,
-        isRegistration && !confirmedAge16OrOlder
+        forcedIsUnder16 ?: (isRegistration && !confirmedAge16OrOlder)
       )
     }
 
@@ -150,7 +153,7 @@ fun PhoneInputView(
       )
       TermsAndConditionsText()
     }
-    if (isRegistration) {
+    if (shouldShowAgeConfirmation) {
       Row(
         verticalAlignment = Alignment.Top,
         modifier = Modifier

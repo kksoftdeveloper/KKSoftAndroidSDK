@@ -1,6 +1,7 @@
 package com.appmb.sdk.mbauth.ui.login
 
 import android.content.Context
+import com.appmb.sdk.mbauth.model.RegistrationProfile
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 
 sealed class AuthIntent {
@@ -23,6 +24,7 @@ sealed class AuthIntent {
   data class Register(
     val phoneNumber: String? = null,
     val password: String,
+    val registrationProfile: RegistrationProfile? = null,
   ) : AuthIntent()
 
   // LinkAccount

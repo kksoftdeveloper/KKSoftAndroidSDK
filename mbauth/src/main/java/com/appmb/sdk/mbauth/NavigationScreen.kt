@@ -53,6 +53,44 @@ data class Register(val phone: String, val isUnder16: Boolean) : AuthScreen(name
   }
 }
 
+data class CompleteProfilePhone(val isUnder16: Boolean) : AuthScreen(name = NAME) {
+  companion object {
+    const val NAME = "CompleteProfilePhone/{isUnder16}"
+  }
+}
+
+data class CompleteProfileVerifyOTP(val phone: String, val timeToRetry: Int, val isUnder16: Boolean) :
+  AuthScreen(name = NAME) {
+  companion object {
+    const val NAME = "CompleteProfileVerifyOTP/{phone}/{timeToRetry}/{isUnder16}"
+  }
+}
+
+data class CompleteProfilePersonalInfo(
+  val isUnder16: Boolean,
+  val requiresUserPhoneVerification: Boolean,
+) : AuthScreen(name = NAME) {
+  companion object {
+    const val NAME = "CompleteProfilePersonalInfo/{isUnder16}/{requiresUserPhoneVerification}"
+  }
+}
+
+data class CompleteProfileGuardianInfo(val requiresUserPhoneVerification: Boolean) : AuthScreen(name = NAME) {
+  companion object {
+    const val NAME = "CompleteProfileGuardianInfo/{requiresUserPhoneVerification}"
+  }
+}
+
+data class CompleteProfileGuardianOTP(
+  val guardianPhone: String,
+  val timeToRetry: Int,
+  val requiresUserPhoneVerification: Boolean,
+) : AuthScreen(name = NAME) {
+  companion object {
+    const val NAME = "CompleteProfileGuardianOTP/{guardianPhone}/{timeToRetry}/{requiresUserPhoneVerification}"
+  }
+}
+
 //object GuestHome : AuthScreen("GuestHome")
 
 data class SetLinkPhoneAccountPassword(val phone: String) : AuthScreen(name = NAME) {

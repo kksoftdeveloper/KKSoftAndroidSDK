@@ -10,12 +10,14 @@ import com.appmb.sdk.mbauth.ui.login.AuthIntent
 import com.appmb.sdk.mbauth.ui.login.AuthResult
 import com.appmb.sdk.mbauth.ui.login.AuthViewModel
 import com.appmb.sdk.mbauth.ui.login.RegisterState
+import com.appmb.sdk.mbauth.model.RegistrationProfile
 import com.appmb.sdk.mbcoreui.R
 
 class SignUpPasswordInputScreen(
   private val activity: Activity,
   private val authViewModel: AuthViewModel,
   phoneNumber: String,
+  private val registrationProfile: RegistrationProfile?,
   onClose: () -> Unit,
   stepLabel: String? = null,
   private val navigateToChooseServer: () -> Unit,
@@ -28,7 +30,8 @@ class SignUpPasswordInputScreen(
     authViewModel.dispatch(
       AuthIntent.Register(
         phoneNumber = phoneNumber,
-        password = password
+        password = password,
+        registrationProfile = registrationProfile,
       )
     )
   }

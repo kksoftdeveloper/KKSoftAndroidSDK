@@ -38,6 +38,7 @@
   <string name="phone_number_hint">(+84) 912 345 6780</string>
   <string name="receive_otp_code">Nhận mã OTP</string>
   <string name="confirm_age_16_or_older">Tôi xác nhận mình đủ 16 tuổi trở lên và chấp nhận với Điều khoản sử dụng</string>
+  <string name="required_profile_update_title">Cần cập nhật thông tin</string>
 
   <!--  Verify OTP screen-->
   <string name="step_2">Bước 2/3</string>

@@ -370,6 +370,7 @@ class AuthViewModel internal constructor(
     val authParams = MbAuthParams.buildRegister(
       phone = intent.phoneNumber,
       password = intent.password,
+      registrationProfile = intent.registrationProfile,
     )
     viewModelScope.launch {
       _uiState.update { it.copy(isLoading = true) }

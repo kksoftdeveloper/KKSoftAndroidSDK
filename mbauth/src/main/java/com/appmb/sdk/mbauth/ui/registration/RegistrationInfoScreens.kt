@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -37,10 +38,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.appmb.sdk.mbauth.model.MbAuthParams
+import com.appmb.sdk.mbauth.model.GuardianRegistrationInfo
+import com.appmb.sdk.mbauth.model.RegistrationInfo
 import com.appmb.sdk.mbauth.ui.frame.MbAuthFrameContainer
 import com.appmb.sdk.mbauth.ui.phoneinput.PhoneInputIntent
 import com.appmb.sdk.mbauth.ui.phoneinput.PhoneInputViewModel
@@ -53,7 +55,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun PersonalInfoScreen(
   stepLabel: String,
-  onContinue: () -> Unit,
+  onContinue: (RegistrationInfo) -> Unit,
   onClose: () -> Unit,
 ) {
   var fullName by rememberSaveable { mutableStateOf("") }
@@ -70,7 +72,16 @@ fun PersonalInfoScreen(
   MbAuthFrameContainer(
     buttonLabel = stringResource(R.string.common_continue),
     buttonEnabledState = canContinue,
-    onButtonClick = onContinue,
+    onButtonClick = {
+      onContinue(
+        RegistrationInfo(
+          fullName = fullName.trim(),
+          dateOfBirth = birthDate.toApiBirthDate(),
+          gender = gender.toApiGender(),
+          address = address.trim().takeIf { it.isNotBlank() },
+        )
+      )
+    },
     onCloseButtonClick = onClose,
   ) {
     RegistrationTitle(
@@ -121,7 +132,7 @@ fun PersonalInfoScreen(
 @Composable
 fun GuardianInfoScreen(
   stepLabel: String,
-  onContinue: (String, Int) -> Unit,
+  onContinue: (GuardianRegistrationInfo, Int) -> Unit,
   onClose: () -> Unit,
 ) {
   val viewModel: PhoneInputViewModel = koinViewModel()
@@ -143,7 +154,15 @@ fun GuardianInfoScreen(
   when (val state = requestOtpState.value) {
     is RequestOtpState.Success -> {
       viewModel.dispatchUiEvent(PhoneInputIntent.ResetState)
-      onContinue(state.phone, state.timeToRetry)
+      onContinue(
+        GuardianRegistrationInfo(
+          fullName = fullName.trim(),
+          dateOfBirth = birthDate.toApiBirthDate(),
+          phone = state.phone,
+          address = address.trim().takeIf { it.isNotBlank() },
+        ),
+        state.timeToRetry
+      )
     }
 
     else -> Unit
@@ -298,7 +317,7 @@ private fun GenderDropdownField(
         .fillMaxWidth()
         .padding(top = 4.dp)
         .onGloballyPositioned { coordinates ->
-          fieldSize = coordinates.size.toSize()
+          fieldSize = coordinates.boundsInWindow().size
         }
         .heightIn(min = 32.dp)
         .background(
@@ -529,3 +548,18 @@ private fun isLeapYear(year: Int): Boolean =
 
 private fun String.isValidVietnamPhoneNumber(): Boolean =
   Regex("""^(?:\+?84|0)([35789])\d{8}$""").matches(this)
+
+private fun String.toApiBirthDate(): String {
+  val parts = split("/")
+  if (parts.size != 3) return this
+  val (day, month, year) = parts
+  return "$year-$month-$day"
+}
+
+private fun String.toApiGender(): String? =
+  when (this) {
+    "Nam" -> "MALE"
+    "Nữ" -> "FEMALE"
+    "Khác" -> "OTHER"
+    else -> null
+  }

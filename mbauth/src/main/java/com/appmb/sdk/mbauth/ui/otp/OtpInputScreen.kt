@@ -33,6 +33,7 @@ import com.appmb.sdk.mbauth.ui.frame.MbAuthFrameContainer
 import com.appmb.sdk.mbauth.ui.otp.OtpState.Companion.RETRY_TIME
 import com.appmb.sdk.mbauth.ui.otp.components.OtpCountdownTimer
 import com.appmb.sdk.mbauth.ui.otp.components.OtpInput
+import com.appmb.sdk.mbauth.data.dto.response.VerifyOtpData
 import com.appmb.sdk.mbcore.model.localization
 import com.appmb.sdk.mbcoreui.R
 import com.appmb.sdk.mbcoreui.common.CustomFont
@@ -47,7 +48,7 @@ fun OtpInputScreen(
   phoneNumber: String,
   timeToRetry: Int,
   stepLabel: String? = null,
-  onOtpVerifiedSuccess: () -> Unit,
+  onOtpVerifiedSuccess: (VerifyOtpData) -> Unit,
   onClose: () -> Unit
 ) {
   val viewModel: OtpInputViewModel =
@@ -57,7 +58,7 @@ fun OtpInputScreen(
   ObserveAsEvents(flow = viewModel.events) { event ->
     when (event) {
       is OtpEvent.VerifiedOTP -> {
-        onOtpVerifiedSuccess()
+        onOtpVerifiedSuccess(event.verifiedOTPData)
       }
 
       is OtpEvent.RequestedOTP -> {

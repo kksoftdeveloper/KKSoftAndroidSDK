@@ -1,5 +1,6 @@
 package com.appmb.sdk.mbauth.data.repo
 
+import android.os.Build
 import android.util.Log
 import arrow.core.Either
 import arrow.core.flatMap
@@ -13,6 +14,8 @@ import com.appmb.sdk.mbauth.data.dto.request.MbLoginGuestRequest
 import com.appmb.sdk.mbauth.data.dto.request.MbLoginSocialRequest
 import com.appmb.sdk.mbauth.data.dto.request.MbRegisterRequest
 import com.appmb.sdk.mbauth.data.dto.request.MbRequestOtpRequest
+import com.appmb.sdk.mbauth.data.dto.request.MbRegisterConsentRequest
+import com.appmb.sdk.mbauth.data.dto.request.MbRegisterGuardianRequest
 import com.appmb.sdk.mbauth.data.dto.request.MbResetPasswordRequest
 import com.appmb.sdk.mbauth.data.dto.request.MbVerifyOtpRequest
 import com.appmb.sdk.mbauth.data.dto.request.toMap
@@ -300,7 +303,9 @@ class MbAuthRepositoryImpl(
     authParams: MbAuthParams,
   ): Either<NetworkError, RegisterDataModel?> = coroutineScope {
     val (deviceId, gameId) = getDeviceAndGameIdEnsuringGameInfo()
-    val otpVerifiedToken = mbCommonDataSource.getOtpVerifiedToken()
+    val registrationProfile = authParams.registrationProfile
+    val otpVerifiedToken = registrationProfile?.playerOtpVerifiedToken
+      ?: mbCommonDataSource.getOtpVerifiedToken()
     val signDeferred = async {
       val sign =
         "$deviceId|$gameId|${authParams.phone}|${authParams.password}|$otpVerifiedToken|${mbCommonDataSource.getPlatform()}|" +
@@ -313,15 +318,35 @@ class MbAuthRepositoryImpl(
 
     val request = MbRegisterRequest(
       deviceId = deviceId,
+      device = Build.MODEL,
       platform = mbCommonDataSource.getPlatform(),
       sdkVersion = mbCommonDataSource.getSdkVersion(),
       appVersion = mbSdkConfig.getAppVersionName(),
-      gameId = gameId,
+      gameId = gameId.toIntOrNull(),
       serverId = serverId,
       otpVerifiedToken = otpVerifiedToken,
       type = "phone",
       phone = authParams.phone,
       password = authParams.password,
+      fullName = registrationProfile?.personalInfo?.fullName,
+      dateOfBirth = registrationProfile?.personalInfo?.dateOfBirth,
+      gender = registrationProfile?.personalInfo?.gender,
+      address = registrationProfile?.personalInfo?.address,
+      consent = registrationProfile?.consent?.let { consent ->
+        MbRegisterConsentRequest(
+          legalAccepted = consent.legalAccepted,
+          selfRegistrationAgeConfirmed = consent.selfRegistrationAgeConfirmed,
+        )
+      },
+      guardian = registrationProfile?.guardian?.let { guardian ->
+        MbRegisterGuardianRequest(
+          fullName = guardian.fullName,
+          dateOfBirth = guardian.dateOfBirth,
+          phone = guardian.phone,
+          address = guardian.address,
+          otpVerifiedToken = guardian.otpVerifiedToken,
+        )
+      },
       sign = signDeferred.await(),
       adid = mbCommonDataSource.getAdid()
     )
@@ -372,7 +397,7 @@ class MbAuthRepositoryImpl(
       platform = mbCommonDataSource.getPlatform(),
       sdkVersion = mbCommonDataSource.getSdkVersion(),
       appVersion = mbSdkConfig.getAppVersionName(),
-      gameId = mbCommonDataSource.getGameId(),
+      gameId = mbCommonDataSource.getGameId().toIntOrNull(),
       otpVerifiedToken = otpVerifiedToken,
       type = "phone",
       phone = mbAuthParams.phone,
