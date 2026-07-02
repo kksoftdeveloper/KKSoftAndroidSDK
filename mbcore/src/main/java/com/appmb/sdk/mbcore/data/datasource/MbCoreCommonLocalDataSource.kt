@@ -25,16 +25,17 @@ class MbCoreCommonLocalDataSource(
   }
 
   override suspend fun getGameId(): String {
-    return dataStoreManager.getPreference(
+    val gameId = dataStoreManager.getPreference(
       MbCoreCommonDataSource.Companion.gameIdKey,
       String.empty()
     ).firstOrNull().orEmpty()
+    return gameId.normalizedGameIdOrDefault()
   }
 
   override suspend fun saveGameId(gameId: String) {
     dataStoreManager.putPreference(
       MbCoreCommonDataSource.Companion.gameIdKey,
-      gameId
+      gameId.normalizedGameIdOrDefault()
     )
   }
 
@@ -184,4 +185,8 @@ class MbCoreCommonLocalDataSource(
     saveTimeRemaining("0")
     saveGuestLoginStartTime(0)
   }
+}
+
+private fun String?.normalizedGameIdOrDefault(): String {
+  return this?.trim()?.toIntOrNull()?.takeIf { it >= 1 }?.toString() ?: "1"
 }

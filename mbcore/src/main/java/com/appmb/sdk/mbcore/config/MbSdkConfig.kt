@@ -24,7 +24,7 @@ class MbSdkConfig {
   }
 
   fun getGameId(): String? {
-    return gameId
+    return gameId.normalizedGameIdOrDefault()
   }
 
   fun getServerClientId(): String? {
@@ -99,8 +99,8 @@ class MbSdkConfig {
       this.appId = appId
     }
 
-    fun setGameId(gameId: String) = apply {
-      this.gameId = gameId
+    fun setGameId(gameId: String?) = apply {
+      this.gameId = gameId.normalizedGameIdOrDefault()
     }
 
     fun setAppVersionName(appVersionName: String) = apply {
@@ -137,7 +137,7 @@ class MbSdkConfig {
 
     fun build() = MbSdkConfig().apply {
       this.appId = this@Builder.appId
-      this.gameId = this@Builder.gameId
+      this.gameId = this@Builder.gameId.normalizedGameIdOrDefault()
       this.appVersionName = this@Builder.appVersionName
       this.baseUrl = this@Builder.baseUrl
       this.authSdkVersion = this@Builder.authSdkVersion
@@ -149,4 +149,8 @@ class MbSdkConfig {
       this.facebookClientToken = this@Builder.facebookClientToken
     }
   }
+}
+
+private fun String?.normalizedGameIdOrDefault(): String {
+  return this?.trim()?.toIntOrNull()?.takeIf { it >= 1 }?.toString() ?: "1"
 }

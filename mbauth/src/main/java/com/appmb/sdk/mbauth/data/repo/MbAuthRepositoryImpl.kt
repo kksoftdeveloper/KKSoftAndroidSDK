@@ -57,17 +57,17 @@ class MbAuthRepositoryImpl(
     // Priority: 
     // 1. MbSdkConfig (manual/client set)
     // 2. DataStore (cached from previous remote fetch)
-    val localGameId = mbSdkConfig.getGameId()?.takeIf { it.isNotBlank() && it != "0" }
-    val cachedGameId = mbCommonDataSource.getGameId()
+    val localGameId = mbSdkConfig.getGameId().normalizedGameIdOrDefault()
+    val cachedGameId = mbCommonDataSource.getGameId().normalizedGameIdOrDefault()
     
-    val gameIdToUse = localGameId ?: cachedGameId.takeIf { it.isNotBlank() && it != "0" } ?: ""
+    val gameIdToUse = localGameId.takeIf { it != "1" } ?: cachedGameId
 
     if (gameIdToUse.isBlank()) {
       gameRepository.fetchGameInfo()
     }
 
     val finalGameId = if (gameIdToUse.isBlank()) {
-        mbCommonDataSource.getGameId().takeIf { it.isNotBlank() && it != "0" } ?: "1"
+        mbCommonDataSource.getGameId().normalizedGameIdOrDefault()
     } else {
         gameIdToUse
     }
@@ -378,7 +378,7 @@ class MbAuthRepositoryImpl(
       type = linkAccountType,
       deviceId = deviceId,
       serverId = serverId,
-      gameId = mbCommonDataSource.getGameId().toInt(),
+      gameId = mbCommonDataSource.getGameId().toGameIdOrDefault(),
       appVersion = mbSdkConfig.getAppVersionName(),
       sdkVersion = mbSdkConfig.getAuthSdkVersion(),
       platform = "android",
@@ -397,7 +397,7 @@ class MbAuthRepositoryImpl(
       platform = mbCommonDataSource.getPlatform(),
       sdkVersion = mbCommonDataSource.getSdkVersion(),
       appVersion = mbSdkConfig.getAppVersionName(),
-      gameId = mbCommonDataSource.getGameId().toIntOrNull(),
+      gameId = mbCommonDataSource.getGameId().toGameIdOrDefault(),
       otpVerifiedToken = otpVerifiedToken,
       type = "phone",
       phone = mbAuthParams.phone,
@@ -477,4 +477,12 @@ class MbAuthRepositoryImpl(
       }
     )
   }
+}
+
+private fun String?.normalizedGameIdOrDefault(): String {
+  return this?.trim()?.toIntOrNull()?.takeIf { it >= 1 }?.toString() ?: "1"
+}
+
+private fun String?.toGameIdOrDefault(): Int {
+  return this?.trim()?.toIntOrNull()?.takeIf { it >= 1 } ?: 1
 }

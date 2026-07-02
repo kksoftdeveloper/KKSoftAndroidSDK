@@ -212,9 +212,9 @@ class AuthActivity : ComponentActivity() {
         ?: remoteFacebookClientToken?.takeIf { it.isNotBlank() }
         ?: trackingFacebookClientToken
 
-      val gameId = mbSdkConfig.getGameId()?.takeIf { it.isNotBlank() && it != "0" }
-        ?: remoteGameId?.takeIf { it.isNotBlank() && it != "0" }
-        ?: "1" // Default to 1 if not set, to avoid blocking login screen
+      val gameId = mbSdkConfig.getGameId().normalizedGameIdOrDefault()
+        .takeIf { it != "1" }
+        ?: remoteGameId.normalizedGameIdOrDefault()
 
       Log.d(TAG, "Final Configs:")
       Log.d(TAG, "Google Client ID: $googleClientId")
@@ -311,7 +311,7 @@ class AuthActivity : ComponentActivity() {
           Box(Modifier.fillMaxSize()) {
             AppContent(
               params = params,
-              gameId = if (gameId.isBlank() || gameId == "0") 1 else gameId.toInt(),
+              gameId = gameId.toGameIdOrDefault(),
               handleGoogleSignIn = {
                 if (::googleSignInClient.isInitialized) {
                   callBackAfterGoogleSignIn = it
@@ -404,6 +404,14 @@ private fun logFacebookNativePlatformConfig(context: Context, facebookAppId: Str
     AuthActivity.TAG,
     "Facebook native platform config. appId=$facebookAppId, packageName=$packageName, keyHashes=$keyHashes"
   )
+}
+
+private fun String?.normalizedGameIdOrDefault(): String {
+  return this?.trim()?.toIntOrNull()?.takeIf { it >= 1 }?.toString() ?: "1"
+}
+
+private fun String?.toGameIdOrDefault(): Int {
+  return this?.trim()?.toIntOrNull()?.takeIf { it >= 1 } ?: 1
 }
 
 @Composable

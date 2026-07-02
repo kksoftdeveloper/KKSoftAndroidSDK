@@ -99,8 +99,9 @@ class MbGameRepositoryImpl(
         }
 
         gameInfo.data?.game?.gameId?.let { gameId ->
-          mbCommonDataSource.saveGameId(gameId.toString())
-          when (val serversEither = mbGameDataSource.getServerList(gameId.toString())) {
+          val normalizedGameId = gameId.takeIf { it >= 1 }?.toString() ?: "1"
+          mbCommonDataSource.saveGameId(normalizedGameId)
+          when (val serversEither = mbGameDataSource.getServerList(normalizedGameId)) {
             is Either.Right -> {
               serversEither.value.data?.let { serverList ->
                 val server = serverList.findLast { it.serverName == mbSdkConfig.getServerClientId() }
@@ -134,8 +135,7 @@ class MbGameRepositoryImpl(
   }
 
   override suspend fun getGameId(): Int {
-    val gameId = mbCommonDataSource.getGameId().takeIf { it.isNotBlank() } ?: return 1
-    return gameId.toIntOrNull() ?: 1
+    return mbCommonDataSource.getGameId().toIntOrNull()?.takeIf { it >= 1 } ?: 1
   }
 
   private fun initializeFirebase(config: FirebaseConfig) {
