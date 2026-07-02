@@ -21,10 +21,12 @@ class PhoneInputViewModel : ViewModel() {
   private val phoneRegex = Regex("""^(?:\+?84|0)([35789])\d{8}$""")
 
   fun onAcceptTermsChange(accepted: Boolean) {
+    requestOtpState.value = RequestOtpState.Idle
     _uiState.update { it.copy(acceptTerms = accepted) }
   }
 
   fun onConfirmedAge16OrOlderChange(confirmed: Boolean) {
+    requestOtpState.value = RequestOtpState.Idle
     _uiState.update { it.copy(confirmedAge16OrOlder = confirmed) }
   }
 

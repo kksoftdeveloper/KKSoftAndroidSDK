@@ -59,6 +59,8 @@ data class CompleteProfilePhone(val isUnder16: Boolean) : AuthScreen(name = NAME
   }
 }
 
+object CompleteProfilePhoneWithAgeConfirmation : AuthScreen("CompleteProfilePhoneWithAgeConfirmation")
+
 data class CompleteProfileVerifyOTP(val phone: String, val timeToRetry: Int, val isUnder16: Boolean) :
   AuthScreen(name = NAME) {
   companion object {

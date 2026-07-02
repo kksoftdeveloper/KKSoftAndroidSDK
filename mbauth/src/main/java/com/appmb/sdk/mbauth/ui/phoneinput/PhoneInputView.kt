@@ -31,6 +31,7 @@ import com.appmb.sdk.mbauth.ui.frame.MbAuthFrameContainer
 import com.appmb.sdk.mbcoreui.R
 import com.appmb.sdk.mbcoreui.common.CustomCheckbox
 import com.appmb.sdk.mbcoreui.common.CustomFont
+import com.appmb.sdk.mbcoreui.common.RequiredFieldLabel
 import com.appmb.sdk.mbcoreui.common.TextInputField
 import org.koin.androidx.compose.koinViewModel
 
@@ -112,7 +113,7 @@ fun PhoneInputView(
       ),
       modifier = Modifier.padding(top = 6.dp, bottom = 12.dp)
     )
-    BasicText(
+    RequiredFieldLabel(
       text = stringResource(R.string.phone_number_label),
       style = TextStyle(
         color = colorResource(R.color.black),
@@ -145,6 +146,7 @@ fun PhoneInputView(
         checked = acceptTerms,
         onCheckedChange = {
           acceptTerms = it
+          apiError = ""
           viewModel.onAcceptTermsChange(it)
         },
         modifier = Modifier.size(16.dp)
@@ -165,6 +167,7 @@ fun PhoneInputView(
           checked = confirmedAge16OrOlder,
           onCheckedChange = {
             confirmedAge16OrOlder = it
+            apiError = ""
             viewModel.onConfirmedAge16OrOlderChange(it)
           },
           modifier = Modifier.size(16.dp)

@@ -5,7 +5,7 @@
   <string name="phone_number_invalid">Số điện thoại không hợp lệ</string>
   <string name="enter_phone_number_label">Enter your phone number</string>
   <string name="password_label">Mật khẩu</string>
-  <string name="enter_password_hint">Nhập mật khẩu</string>
+  <string name="enter_password_hint">8-20 ký tự</string>
   <string name="reenter_password_hint">Nhập lại mật khẩu</string>
   <string name="enter_password_label">Enter your password</string>
   <string name="accept_terms">Tôi đồng ý với điều kiện và điều khoản</string>
@@ -14,7 +14,7 @@
   <string name="continue_with_google">Continue with Google</string>
   <string name="continue_with_facebook">Continue with Facebook</string>
   <string name="play_as_guest">Chơi ngay</string>
-  <string name="dont_have_account">Không có tài khoản?</string>
+  <string name="dont_have_account">Chưa có tài khoản?</string>
   <string name="sign_up_now">Đăng ký ngay</string>
   <string name="sign_up">Đăng ký</string>
   <string name="forgot_password">Quên mật khẩu?</string>
@@ -35,9 +35,9 @@
   <string name="enter_phone_number">Nhập SĐT của bạn</string>
   <string name="we_will_send_you_a_verification_code">Chúng tôi sẽ gửi cho bạn mã xác thực</string>
   <string name="common_continue">Tiếp tục</string>
-  <string name="phone_number_hint">(+84) 912 345 6780</string>
+  <string name="phone_number_hint">(+84)</string>
   <string name="receive_otp_code">Nhận mã OTP</string>
-  <string name="confirm_age_16_or_older">Tôi xác nhận mình đủ 16 tuổi trở lên và chấp nhận với Điều khoản sử dụng</string>
+  <string name="confirm_age_16_or_older">Tôi xác nhận mình đủ 16 tuổi trở lên và đồng ý với Điều khoản sử dụng</string>
   <string name="required_profile_update_title">Cần cập nhật thông tin</string>
 
   <!--  Verify OTP screen-->

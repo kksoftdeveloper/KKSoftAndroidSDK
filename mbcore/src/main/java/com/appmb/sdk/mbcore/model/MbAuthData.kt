@@ -15,6 +15,7 @@ data class MbAuthData(
   val serverId: String? = null,
   val gameUuid: String? = null,
   val userId: String? = null,
+  val phone: String? = null,
   val refreshExpireDate: String? = null,
   val isGuest: Boolean? = false,
   val userBlocked: Boolean? = false,

@@ -6,7 +6,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -102,6 +104,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+import java.security.MessageDigest
 import java.util.Calendar
 
 class AuthActivity : ComponentActivity() {
@@ -190,23 +193,24 @@ class AuthActivity : ComponentActivity() {
       val remoteGameId = async { mbCoreCommonDataSource.getGameId() }.await()
       Log.d(TAG, "Remote config fetched. gameId: $remoteGameId")
 
-      // Restore priority to what was working before:
-      // 1. Tracking Config (Where anh kksoft sets the stable IDs in MyApp.java)
-      // 2. Explicit Auth Config in MbSdkConfig
-      // 3. Remote Config from DataBase
       val trackingConfig = mbSdkConfig.getTrackingConfig()
       
-      val googleClientId = trackingConfig?.gidClientID?.takeIf { it.isNotBlank() }
-        ?: mbSdkConfig.getGoogleClientId()?.takeIf { it.isNotBlank() }
+      val googleClientId = mbSdkConfig.getGoogleClientId()?.takeIf { it.isNotBlank() }
         ?: remoteGoogleClientId?.takeIf { it.isNotBlank() }
+        ?: trackingConfig?.gidClientID?.takeIf { it.isNotBlank() }
         
-      val facebookAppId = trackingConfig?.facebookAppID?.takeIf { it.isNotBlank() }
-        ?: mbSdkConfig.getFacebookAppId()?.takeIf { it.isNotBlank() }
+      val trackingFacebookAppId =
+        trackingConfig?.facebookAppID?.takeIf { trackingConfig.enableMeTa && it.isNotBlank() }
+      val trackingFacebookClientToken =
+        trackingConfig?.facebookClientToken?.takeIf { trackingConfig.enableMeTa && it.isNotBlank() }
+
+      val facebookAppId = mbSdkConfig.getFacebookAppId()?.takeIf { it.isNotBlank() }
         ?: remoteFacebookAppId?.takeIf { it.isNotBlank() }
+        ?: trackingFacebookAppId
         
-      val facebookClientToken = trackingConfig?.facebookClientToken?.takeIf { it.isNotBlank() }
-        ?: mbSdkConfig.getFacebookClientToken()?.takeIf { it.isNotBlank() }
+      val facebookClientToken = mbSdkConfig.getFacebookClientToken()?.takeIf { it.isNotBlank() }
         ?: remoteFacebookClientToken?.takeIf { it.isNotBlank() }
+        ?: trackingFacebookClientToken
 
       val gameId = mbSdkConfig.getGameId()?.takeIf { it.isNotBlank() && it != "0" }
         ?: remoteGameId?.takeIf { it.isNotBlank() && it != "0" }
@@ -236,12 +240,18 @@ class AuthActivity : ComponentActivity() {
 
       // Initialize Facebook SDK only if ID and Token are available
       if (!facebookAppId.isNullOrEmpty() && !facebookClientToken.isNullOrEmpty()) {
-        if (!FacebookSdk.isInitialized()) {
-          FacebookSdk.setApplicationId(facebookAppId)
-          FacebookSdk.setClientToken(facebookClientToken)
-          FacebookSdk.fullyInitialize()
-          FacebookSdk.sdkInitialize(MbSdk.getContext())
+        val previousFacebookAppId = FacebookSdk.getApplicationId()
+        if (!previousFacebookAppId.isNullOrBlank() && previousFacebookAppId != facebookAppId) {
+          Log.w(
+            TAG,
+            "Switching Facebook SDK App ID from $previousFacebookAppId to auth App ID $facebookAppId"
+          )
         }
+        FacebookSdk.setApplicationId(facebookAppId)
+        FacebookSdk.setClientToken(facebookClientToken)
+        FacebookSdk.sdkInitialize(applicationContext)
+        FacebookSdk.fullyInitialize()
+        logFacebookNativePlatformConfig(this@AuthActivity, facebookAppId)
       } else {
         Log.w(TAG, "Facebook App ID or Client Token is missing. Facebook Sign In will be disabled.")
       }
@@ -371,6 +381,31 @@ class AuthActivity : ComponentActivity() {
   }
 }
 
+private fun logFacebookNativePlatformConfig(context: Context, facebookAppId: String) {
+  val packageName = context.packageName
+  val keyHashes = runCatching {
+    val packageInfo = context.packageManager.getPackageInfo(
+      packageName,
+      PackageManager.GET_SIGNATURES
+    )
+    packageInfo.signatures
+      ?.map { signature ->
+        val digest = MessageDigest.getInstance("SHA")
+        digest.update(signature.toByteArray())
+        Base64.encodeToString(digest.digest(), Base64.NO_WRAP)
+      }
+      .orEmpty()
+  }.getOrElse { error ->
+    Log.w(AuthActivity.TAG, "Unable to read Facebook key hash: ${error.message}")
+    emptyList()
+  }
+
+  Log.i(
+    AuthActivity.TAG,
+    "Facebook native platform config. appId=$facebookAppId, packageName=$packageName, keyHashes=$keyHashes"
+  )
+}
+
 @Composable
 fun AppContent(
   params: SdkParams?,
@@ -430,6 +465,10 @@ fun AppNavigator(
   fun openProfileCompletionFlow(requirement: LoginProfileRequirement) {
     when (requirement) {
       LoginProfileRequirement.Complete -> completePendingLogin()
+      LoginProfileRequirement.MissingPhone -> {
+        navController.navigate(route = CompleteProfilePhoneWithAgeConfirmation.name)
+      }
+
       LoginProfileRequirement.MissingBirthDate -> showMissingBirthDateDialog = true
       LoginProfileRequirement.Adult -> {
         navController.navigate(route = "CompleteProfilePersonalInfo/false/false")
@@ -443,7 +482,11 @@ fun AppNavigator(
 
   fun resolveLoginProfileRequirement(result: AuthResult.AuthSuccess): LoginProfileRequirement {
     return if (result.user.identityVerificationRequired == true) {
-      LoginProfileRequirement.MissingBirthDate
+      if (result.isSocialLogin && result.user.phone.isNullOrBlank()) {
+        LoginProfileRequirement.MissingPhone
+      } else {
+        LoginProfileRequirement.MissingBirthDate
+      }
     } else {
       LoginProfileRequirement.Complete
     }
@@ -589,10 +632,12 @@ fun AppNavigator(
         stepLabel = RegistrationFlow.label(RegistrationStep.PersonalInfo, isUnder16),
         onContinue = { personalInfo ->
           registrationPersonalInfo = personalInfo
-          if (isUnder16) {
+          val resolvedIsUnder16 =
+            if (personalInfo.dateOfBirth.isUnder16BirthDate() == true) true else isUnder16
+          if (resolvedIsUnder16) {
             navController.navigate(route = "RegisterGuardianInfo/$phoneNumber")
           } else {
-            navController.navigate(route = "Register/$phoneNumber/$isUnder16")
+            navController.navigate(route = "Register/$phoneNumber/$resolvedIsUnder16")
           }
         },
         onClose = {
@@ -710,6 +755,25 @@ fun AppNavigator(
       )
     }
 
+    composable(route = CompleteProfilePhoneWithAgeConfirmation.name) {
+      PhoneInputView(
+        otpType = MbAuthParams.OTP_TYPE_PARAM_REGISTRATION,
+        stepLabel = RegistrationFlow.profileCompletionLabel(
+          ProfileCompletionStep.Phone,
+          isUnder16 = false,
+          requiresUserPhoneVerification = true
+        ),
+        showAgeConfirmation = true,
+        forcedIsUnder16 = null,
+        navigateToVerifyOtp = { phone, timeToRetry, isUnder16 ->
+          navController.navigate(route = "CompleteProfileVerifyOTP/$phone/$timeToRetry/$isUnder16")
+        },
+        onClose = {
+          cancelPendingProfileCompletion()
+        }
+      )
+    }
+
     composable(
       route = CompleteProfileVerifyOTP.NAME,
       arguments = listOf(
@@ -756,7 +820,8 @@ fun AppNavigator(
           requiresUserPhoneVerification = requiresUserPhoneVerification
         ),
         onContinue = { personalInfo ->
-          val resolvedIsUnder16 = personalInfo.dateOfBirth.isUnder16BirthDate() ?: isUnder16
+          val resolvedIsUnder16 =
+            if (personalInfo.dateOfBirth.isUnder16BirthDate() == true) true else isUnder16
           if (resolvedIsUnder16) {
             navController.navigate(route = "CompleteProfileGuardianInfo/$requiresUserPhoneVerification")
           } else {
@@ -1033,6 +1098,7 @@ private fun String.isUnder16BirthDate(): Boolean? {
 
 private enum class LoginProfileRequirement {
   Complete,
+  MissingPhone,
   MissingBirthDate,
   Adult,
   Under16,

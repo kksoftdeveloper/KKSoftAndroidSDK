@@ -32,6 +32,7 @@ import com.appmb.sdk.mbauth.ui.login.AuthViewModel
 import com.appmb.sdk.mbcoreui.R
 import com.appmb.sdk.mbcoreui.common.CustomFont
 import com.appmb.sdk.mbcoreui.common.PasswordInputWithToggle
+import com.appmb.sdk.mbcoreui.common.RequiredFieldLabel
 import org.koin.androidx.compose.koinViewModel
 
 abstract class PasswordInputView(
@@ -89,7 +90,7 @@ abstract class PasswordInputView(
         fontSize = 16.sp,
       )
       // Password field
-      BasicText(
+      RequiredFieldLabel(
         text = stringResource(R.string.password_label),
         style = TextStyle(
           color = colorResource(R.color.black),
@@ -110,7 +111,7 @@ abstract class PasswordInputView(
         modifier = Modifier.padding(top = 2.dp)
       )
       // Confirm password field
-      BasicText(
+      RequiredFieldLabel(
         text = stringResource(R.string.confirm_pwd_label),
         style = TextStyle(
           color = colorResource(R.color.black),

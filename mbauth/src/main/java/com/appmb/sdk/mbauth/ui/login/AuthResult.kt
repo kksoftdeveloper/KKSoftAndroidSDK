@@ -6,7 +6,10 @@ import kotlinx.parcelize.Parcelize
 
 sealed class AuthResult : Parcelable {
   @Parcelize
-  data class AuthSuccess(val user: MbAuthData) : AuthResult()
+  data class AuthSuccess(
+    val user: MbAuthData,
+    val isSocialLogin: Boolean = false,
+  ) : AuthResult()
 
   @Parcelize
   data class RegisterSuccess(val user: MbAuthData) : AuthResult()

@@ -117,6 +117,7 @@ class OtpInputViewModel(
         otpState = otpState.copy(
           otpValues = action.otpValues,
           canVerifyOTP = true,
+          errorCode = null,
         )
         if (!otpState.isLocked) {
           onAction(
@@ -131,7 +132,8 @@ class OtpInputViewModel(
       is OtpAction.OTPIncompletion -> {
         otpState = otpState.copy(
           otpValues = action.otpValues,
-          canVerifyOTP = false
+          canVerifyOTP = false,
+          errorCode = null
         )
       }
     }
@@ -140,7 +142,8 @@ class OtpInputViewModel(
   private fun sendRequestOtp(actionData: OtpAction.RequestOtp) {
     viewModelScope.launch {
       otpState = otpState.copy(
-        isLoading = true
+        isLoading = true,
+        errorCode = null
       )
       MbAuth.requestOtp(
         MbAuthParams.buildRequestOtp(
@@ -191,7 +194,8 @@ class OtpInputViewModel(
   private fun verifyOtp(actionData: OtpAction.VerifyOtp) {
     viewModelScope.launch {
       otpState = otpState.copy(
-        isLoading = true
+        isLoading = true,
+        errorCode = null
       )
       MbAuth.verifyOtp(
         MbAuthParams.buildVerifyOtp(

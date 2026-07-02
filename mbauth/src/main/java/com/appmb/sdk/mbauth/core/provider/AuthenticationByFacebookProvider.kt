@@ -63,6 +63,10 @@ internal class AuthenticationByFacebookProvider(
   private suspend fun loginFacebook(context: Context?): Either<NetworkError, String> {
     return suspendCoroutine { continuation ->
       context ?: return@suspendCoroutine continuation.resume(NetworkError.DataNullError.left())
+      Log.d(
+        MbConstant.TAG,
+        "Starting Facebook login with appId=${FacebookSdk.getApplicationId()}, package=${context.packageName}"
+      )
       val callbackManager = CallbackManager.Factory.create()
       val loginManager = LoginManager.getInstance()
       loginManager.logOut()
@@ -75,7 +79,10 @@ internal class AuthenticationByFacebookProvider(
         }
 
         override fun onError(error: FacebookException) {
-          Log.d(MbConstant.TAG, "error: $error")
+          Log.d(
+            MbConstant.TAG,
+            "Facebook login error with appId=${FacebookSdk.getApplicationId()}, package=${context.packageName}: $error"
+          )
           continuation.resume(NetworkError.DataNullError.left())
         }
 

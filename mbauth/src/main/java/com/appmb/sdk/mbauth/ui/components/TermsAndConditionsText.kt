@@ -93,7 +93,7 @@ fun AgeConfirmationTermsText(
   val termsUrl = "https://docs.google.com/document/d/14-sD0kAL9XRNSTjuFu3Oa86xSJw-TSB-z0QaGy7e6OM/edit?tab=t.0"
 
   val annotatedString = buildAnnotatedString {
-    append("Tôi xác nhận mình đủ 16 tuổi trở lên và chấp nhận với ")
+    append("Tôi xác nhận mình đủ 16 tuổi trở lên và đồng ý với ")
 
     pushStringAnnotation(tag = "AGE_TERMS", annotation = termsUrl)
     withStyle(

@@ -43,6 +43,7 @@ import com.appmb.sdk.mbcoreui.R
 import com.appmb.sdk.mbcoreui.common.CustomCheckbox
 import com.appmb.sdk.mbcoreui.common.CustomFont
 import com.appmb.sdk.mbcoreui.common.PasswordInputWithToggle
+import com.appmb.sdk.mbcoreui.common.RequiredFieldLabel
 import com.appmb.sdk.mbcoreui.common.SocialButtonView
 import com.appmb.sdk.mbcoreui.common.TextInputField
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -128,7 +129,7 @@ fun LoginScreen(
         fontSize = 16.sp,
       )
     )
-    BasicText(
+    RequiredFieldLabel(
       text = stringResource(R.string.phone_number_label),
       style = TextStyle(
         color = colorResource(R.color.black),
@@ -153,7 +154,7 @@ fun LoginScreen(
 
     Spacer(modifier = Modifier.height(4.dp))
     // Password field
-    BasicText(
+    RequiredFieldLabel(
       text = stringResource(R.string.password_label),
       style = TextStyle(
         color = colorResource(R.color.black),

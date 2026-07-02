@@ -34,17 +34,43 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.appmb.sdk.mbcoreui.R
+
+@Composable
+fun RequiredFieldLabel(
+  text: String,
+  modifier: Modifier = Modifier,
+  style: TextStyle = TextStyle(
+    color = colorResource(R.color.black),
+    fontFamily = CustomFont.fzPoppinsFont,
+    fontSize = 12.sp,
+  ),
+) {
+  val requiredColor = colorResource(R.color.red_error)
+  BasicText(
+    text = buildAnnotatedString {
+      append(text)
+      withStyle(SpanStyle(color = requiredColor)) {
+        append(" *")
+      }
+    },
+    style = style,
+    modifier = modifier
+  )
+}
 
 @Composable
 fun TextInputField(
@@ -205,7 +231,7 @@ fun SocialButtonView(
           fontSize = 10.sp,
           textAlign = TextAlign.Center
         ),
-        modifier = Modifier.padding(start = 2.dp, top = 1.dp)
+        modifier = Modifier.padding(start = 10.dp, top = 1.dp)
       )
     }
   }

@@ -56,9 +56,13 @@ class AuthViewModel internal constructor(
           !mbConfig.getGoogleClientId().isNullOrBlank() ||
           !remoteGoogleClientId.isNullOrBlank()
 
-      val isFacebookEnabled = (!trackingConfig?.facebookAppID.isNullOrBlank() && !trackingConfig?.facebookClientToken.isNullOrBlank()) ||
+      val isTrackingFacebookEnabled = trackingConfig?.enableMeTa == true &&
+          !trackingConfig.facebookAppID.isNullOrBlank() &&
+          !trackingConfig.facebookClientToken.isNullOrBlank()
+      val isFacebookEnabled =
           (!mbConfig.getFacebookAppId().isNullOrBlank() && !mbConfig.getFacebookClientToken().isNullOrBlank()) ||
-          (!remoteFacebookAppId.isNullOrBlank() && !remoteFacebookClientToken.isNullOrBlank())
+          (!remoteFacebookAppId.isNullOrBlank() && !remoteFacebookClientToken.isNullOrBlank()) ||
+          isTrackingFacebookEnabled
 
       _uiState.update { 
         it.copy(
@@ -70,15 +74,15 @@ class AuthViewModel internal constructor(
   }
 
   fun onPhoneChange(phone: String) {
-    _uiState.update { it.copy(phone = phone) }
+    _uiState.update { it.copy(phone = phone, errorCode = null) }
   }
 
   fun onPasswordChange(password: String) {
-    _uiState.update { it.copy(password = password) }
+    _uiState.update { it.copy(password = password, errorCode = null) }
   }
 
   fun onAcceptTermsChange(accepted: Boolean) {
-    _uiState.update { it.copy(acceptTerms = accepted) }
+    _uiState.update { it.copy(acceptTerms = accepted, errorCode = null) }
   }
 
   fun dispatch(intent: AuthIntent) {
@@ -129,7 +133,7 @@ class AuthViewModel internal constructor(
         appVersion = mbConfig.getAppVersionName(),
         appPackageName = mbConfig.getAppId()
       )
-      _uiState.update { it.copy(isLoading = true) }
+      _uiState.update { it.copy(isLoading = true, errorCode = null) }
       MbAuth.login(authParams) { result ->
         _uiState.update { it.copy(isLoading = false) }
         when (result) {
@@ -155,7 +159,7 @@ class AuthViewModel internal constructor(
 
           is LoginResult.Success -> {
             _authResult.update {
-              AuthResult.AuthSuccess(result.data)
+              AuthResult.AuthSuccess(result.data, isSocialLogin = true)
             }
           }
         }
@@ -173,7 +177,7 @@ class AuthViewModel internal constructor(
       appPackageName = mbConfig.getAppId()
     )
     viewModelScope.launch {
-      _uiState.update { it.copy(isLoading = true) }
+      _uiState.update { it.copy(isLoading = true, errorCode = null) }
       mbAuthManager.login(authParams).collect { result ->
         _uiState.update { it.copy(isLoading = false) }
         when (result) {
@@ -193,7 +197,7 @@ class AuthViewModel internal constructor(
 
           is LoginResult.Success -> {
             _authResult.update {
-              AuthResult.AuthSuccess(result.data)
+              AuthResult.AuthSuccess(result.data, isSocialLogin = true)
             }
           }
 
@@ -215,7 +219,7 @@ class AuthViewModel internal constructor(
       appPackageName = mbConfig.getAppId()
     )
     viewModelScope.launch {
-      _uiState.update { it.copy(isLoading = true) }
+      _uiState.update { it.copy(isLoading = true, errorCode = null) }
       MbAuth.login(authParams) { result ->
         _uiState.update { it.copy(isLoading = false) }
         when (result) {
@@ -325,7 +329,7 @@ class AuthViewModel internal constructor(
       appPackageName = mbConfig.getAppId()
     )
     viewModelScope.launch {
-      _uiState.update { it.copy(isLoading = true) }
+      _uiState.update { it.copy(isLoading = true, errorCode = null) }
       MbAuth.login(authParams) { result ->
         _uiState.update { it.copy(isLoading = false) }
         when (result) {
@@ -373,7 +377,7 @@ class AuthViewModel internal constructor(
       registrationProfile = intent.registrationProfile,
     )
     viewModelScope.launch {
-      _uiState.update { it.copy(isLoading = true) }
+      _uiState.update { it.copy(isLoading = true, errorCode = null) }
       MbAuth.register(authParams) { result ->
         _uiState.update { it.copy(isLoading = false) }
         when (result) {
@@ -415,7 +419,7 @@ class AuthViewModel internal constructor(
         password = intent.password
       )
       _uiState.update {
-        it.copy(isLoading = true)
+        it.copy(isLoading = true, errorCode = null)
       }
       MbAuth.linkPhoneAccount(authParams) { result ->
         _uiState.update { it.copy(isLoading = false) }
@@ -458,7 +462,7 @@ class AuthViewModel internal constructor(
         password = intent.password
       )
       _uiState.update {
-        it.copy(isLoading = true)
+        it.copy(isLoading = true, errorCode = null)
       }
       MbAuth.resetPassword(authParams) { result ->
         _uiState.update {

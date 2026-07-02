@@ -55,7 +55,7 @@ interface MbAuthApi {
 
   companion object {
     const val LOGIN_PATH = "/sdk/api/v1/auth/login"
-    const val REGISTER_PATH = "/sdk/api/v1/auth/register"
+    const val REGISTER_PATH = "/sdk/api/v2/auth/register"
     const val LOGOUT_PATH = "/sdk/api/v1/users/logout"
     const val LINK_ACCOUNT_PATH = "/sdk/api/v1/auth/link-account"
     const val UPDATE_SERVER_ID_PATH =

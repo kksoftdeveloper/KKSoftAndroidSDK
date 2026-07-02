@@ -49,6 +49,7 @@ import com.appmb.sdk.mbauth.ui.phoneinput.PhoneInputViewModel
 import com.appmb.sdk.mbauth.ui.phoneinput.RequestOtpState
 import com.appmb.sdk.mbcoreui.R
 import com.appmb.sdk.mbcoreui.common.CustomFont
+import com.appmb.sdk.mbcoreui.common.RequiredFieldLabel
 import com.appmb.sdk.mbcoreui.common.TextInputField
 import org.koin.androidx.compose.koinViewModel
 
@@ -92,12 +93,14 @@ fun PersonalInfoScreen(
       label = stringResource(R.string.full_name_label),
       value = fullName,
       placeholder = stringResource(R.string.full_name_hint),
+      required = true,
       onValueChange = { fullName = it }
     )
     BirthDateField(
       label = stringResource(R.string.birth_date_label),
       value = birthDate,
       error = birthDateError,
+      required = true,
       onValueChange = { value ->
         val result = formatBirthDateInput(
           previousValue = birthDate,
@@ -190,12 +193,14 @@ fun GuardianInfoScreen(
       label = stringResource(R.string.guardian_full_name_label),
       value = fullName,
       placeholder = stringResource(R.string.full_name_hint),
+      required = true,
       onValueChange = { fullName = it }
     )
     BirthDateField(
       label = stringResource(R.string.guardian_birth_date_label),
       value = birthDate,
       error = birthDateError,
+      required = true,
       onValueChange = { value ->
         val result = formatBirthDateInput(
           previousValue = birthDate,
@@ -211,6 +216,7 @@ fun GuardianInfoScreen(
       label = stringResource(R.string.guardian_phone_label),
       value = phone,
       placeholder = stringResource(R.string.phone_number_hint),
+      required = true,
       onValueChange = { value ->
         if (value.length <= 10 && value.all { it.isDigit() }) {
           phone = value
@@ -264,19 +270,30 @@ private fun RegistrationField(
   label: String,
   value: String,
   placeholder: String,
+  required: Boolean = false,
   onValueChange: (String) -> Unit,
 ) {
-  BasicText(
-    text = label,
-    style = TextStyle(
-      color = colorResource(R.color.black),
-      fontFamily = CustomFont.fzPoppinsFont,
-      fontSize = 12.sp,
-    ),
-    modifier = Modifier
-      .fillMaxWidth()
-      .padding(top = 4.dp)
+  val labelStyle = TextStyle(
+    color = colorResource(R.color.black),
+    fontFamily = CustomFont.fzPoppinsFont,
+    fontSize = 12.sp,
   )
+  val labelModifier = Modifier
+    .fillMaxWidth()
+    .padding(top = 4.dp)
+  if (required) {
+    RequiredFieldLabel(
+      text = label,
+      style = labelStyle,
+      modifier = labelModifier
+    )
+  } else {
+    BasicText(
+      text = label,
+      style = labelStyle,
+      modifier = labelModifier
+    )
+  }
   TextInputField(
     textFieldValue = value,
     onValueChange = onValueChange,
@@ -374,19 +391,30 @@ private fun BirthDateField(
   label: String,
   value: String,
   error: String?,
+  required: Boolean = false,
   onValueChange: (String) -> Unit,
 ) {
-  BasicText(
-    text = label,
-    style = TextStyle(
-      color = colorResource(R.color.black),
-      fontFamily = CustomFont.fzPoppinsFont,
-      fontSize = 12.sp,
-    ),
-    modifier = Modifier
-      .fillMaxWidth()
-      .padding(top = 4.dp)
+  val labelStyle = TextStyle(
+    color = colorResource(R.color.black),
+    fontFamily = CustomFont.fzPoppinsFont,
+    fontSize = 12.sp,
   )
+  val labelModifier = Modifier
+    .fillMaxWidth()
+    .padding(top = 4.dp)
+  if (required) {
+    RequiredFieldLabel(
+      text = label,
+      style = labelStyle,
+      modifier = labelModifier
+    )
+  } else {
+    BasicText(
+      text = label,
+      style = labelStyle,
+      modifier = labelModifier
+    )
+  }
   BasicTextField(
     value = TextFieldValue(
       text = value,
